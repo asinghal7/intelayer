@@ -1,0 +1,11 @@
+# Tally Daybook Voucher Counter - Dependencies
+
+# HTTP library for making requests to Tally server
+requests>=2.31.0
+
+# Standard library modules used (no installation needed):
+# - xml.etree.ElementTree (XML parsing)
+# - datetime (date handling)
+# - argparse (command-line arguments)
+# - configparser (config file parsing)
+

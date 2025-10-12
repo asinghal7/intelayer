@@ -1,0 +1,17 @@
+# Tally Daybook Voucher Counter - Configuration File
+# Copy this file to config.ini and update with your settings
+
+[tally]
+# Tally server URL (including port)
+# Default Tally ODBC port is 9000
+url = http://192.168.0.189:9000
+
+# Company name as it appears in Tally (must match exactly)
+# Include any special characters, spaces, and year suffixes
+company = Ashirwad Electronics (23-24/24-25)
+
+# Note: You can override these settings using command-line arguments:
+#   --tally-url    Override the URL
+#   --company      Override the company name
+#   --date         Specify date in YYYYMMDD format (default: today)
+
