@@ -11,7 +11,8 @@ Intelligent analytics layer for MSME ERPs — **Tally-first**. Extract via **HTT
 4) Install deps into your existing venv:  
    `pip install -e .`
 5) Run ETL once: `python agent/run.py`
-6) Open Metabase: http://localhost:3000 (connect to Postgres).
+6) **[Optional]** Load historical data: `python -m agent.backfill 2024-04-01 2024-10-13` (see `BACKFILL_QUICKSTART.md`)
+7) Open Metabase: http://localhost:3000 (connect to Postgres).
 
 ## Structure
 - `adapters/` — adapter SDK + Tally HTTP adapter
@@ -39,3 +40,23 @@ These tests validate: (1) STATUS handling, (2) DayBook parsing, (3) empty respon
 - Run tests: `pytest -q`
 - Re-run ETL for today: `python agent/run.py`
 - In SQL or Metabase, you can now filter by `vchtype` and totals are **signed** (Sales +, Credit Note/Return -).
+
+## Backfill Historical Data
+
+Load historical data or reload after code changes:
+
+```bash
+# Quick start - load historical data
+python -m agent.backfill 2024-04-01 2024-10-13
+
+# After code changes - clear and reload
+python -m agent.clear_and_reload 2024-04-01 2024-10-13
+
+# Always test first with dry run
+python -m agent.backfill 2024-04-01 2024-10-13 --dry-run
+```
+
+**Documentation:**
+- `BACKFILL_QUICKSTART.md` - Quick reference with common commands
+- `BACKFILL_GUIDE.md` - Comprehensive guide with workflows and troubleshooting
+- `BACKFILL_IMPLEMENTATION_SUMMARY.md` - Technical details and architecture
