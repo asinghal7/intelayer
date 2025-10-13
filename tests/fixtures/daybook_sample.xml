@@ -1,0 +1,14 @@
+<ENVELOPE>
+  <BODY>
+    <DATA>
+      <TALLYMESSAGE>
+        <VOUCHER VCHTYPE="Sales" VCHNUMBER="S-101" GUID="abcd-1234">
+          <DATE>20251011</DATE>
+          <PARTYLEDGERNAME>Acme Distributors</PARTYLEDGERNAME>
+          <AMOUNT>1234.50</AMOUNT>
+        </VOUCHER>
+      </TALLYMESSAGE>
+    </DATA>
+  </BODY>
+</ENVELOPE>
+

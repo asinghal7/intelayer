@@ -1,0 +1,25 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: intelayer
+      POSTGRES_USER: inteluser
+      POSTGRES_PASSWORD: change_me
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+
+  metabase:
+    image: metabase/metabase:latest
+    ports: ["3000:3000"]
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_DBNAME: intelayer_meta
+      MB_DB_PORT: 5432
+      MB_DB_USER: inteluser
+      MB_DB_PASS: change_me
+      MB_DB_HOST: db
+    depends_on: ["db"]
+
+volumes:
+  pgdata: {}
+

@@ -205,3 +205,13 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Project specific
+Test/
+.DS_Store
+*.xml
+!tests/fixtures/*.xml
+!adapters/tally_http/requests/*.xml.j2
+ops/backups/
+debug.xml
+error_response*.xml
