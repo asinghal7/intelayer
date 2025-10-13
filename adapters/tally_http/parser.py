@@ -27,29 +27,84 @@ def _to_float(x: str | None) -> float:
         val = 0.0
     return -val if neg else val
 
-def _party_line_amount_signed(voucher: etree._Element, party_name: str) -> float | None:
+def _party_line_amount_signed(voucher: etree._Element, party_name: str, vchtype: str = None) -> float | None:
+    """
+    Extract party ledger amount with voucher-type aware tag selection.
+    - For Invoice vouchers: Check LEDGERENTRIES.LIST (single R)
+    - For other vouchers: Check ALLLEDGERENTRIES.LIST (double L)
+    """
     party = (party_name or "").strip().lower()
+    
+    # For Invoice vouchers, check LEDGERENTRIES.LIST (single R)
+    if vchtype == "Invoice":
+        for le in voucher.findall(".//LEDGERENTRIES.LIST"):
+            lname = (le.findtext("LEDGERNAME") or "").strip().lower()
+            if lname == party or party[:15] in lname[:15]:
+                return _to_float(le.findtext("AMOUNT"))  # keep sign
+    
+    # For all other voucher types, check ALLLEDGERENTRIES.LIST (double L)
     for le in voucher.findall(".//ALLLEDGERENTRIES.LIST"):
         lname = (le.findtext("LEDGERNAME") or "").strip().lower()
-        if lname == party:
+        if lname == party or party[:15] in lname[:15]:
             return _to_float(le.findtext("AMOUNT"))  # keep sign
+    
     return None
 
-def _fallback_amount_signed(voucher: etree._Element) -> float:
-    # choose the line with largest magnitude; keep its original sign
+def _fallback_amount_signed(voucher: etree._Element, vchtype: str = None) -> float:
+    """
+    Choose the line with largest magnitude; keep its original sign.
+    - For Invoice vouchers: Check LEDGERENTRIES.LIST (single R)
+    - For other vouchers: Check ALLLEDGERENTRIES.LIST (double L)
+    """
     best_val = 0.0
     best_abs = 0.0
+    
+    # For Invoice vouchers, check LEDGERENTRIES.LIST (single R)
+    if vchtype == "Invoice":
+        for le in voucher.findall(".//LEDGERENTRIES.LIST"):
+            v = _to_float(le.findtext("AMOUNT"))
+            if abs(v) > best_abs:
+                best_abs = abs(v)
+                best_val = v
+    
+    # For all other voucher types, check ALLLEDGERENTRIES.LIST (double L)
     for le in voucher.findall(".//ALLLEDGERENTRIES.LIST"):
         v = _to_float(le.findtext("AMOUNT"))
         if abs(v) > best_abs:
             best_abs = abs(v)
             best_val = v
+    
     return best_val
+
+def _bill_allocation_amount(voucher: etree._Element) -> float | None:
+    """
+    Extract amount from BILLALLOCATIONS.LIST (post-tax total for invoices).
+    This is the most accurate for Invoice vouchers as it includes tax.
+    Returns None if not found.
+    """
+    for bill_alloc in voucher.findall(".//BILLALLOCATIONS.LIST"):
+        amt_text = bill_alloc.findtext("AMOUNT")
+        if amt_text:
+            # Return absolute value (bill allocations are typically negative)
+            return abs(_to_float(amt_text))
+    return None
+
+def _inventory_total_amount(voucher: etree._Element) -> float:
+    """
+    Calculate total amount from inventory entries (pre-tax).
+    Used as fallback for Invoice/Sales vouchers where bill allocation is not available.
+    Note: This gives pre-tax total, so should be used as last resort.
+    """
+    total = 0.0
+    for inv_entry in voucher.findall(".//ALLINVENTORYENTRIES.LIST"):
+        amt = _to_float(inv_entry.findtext("AMOUNT"))
+        total += amt
+    return total
 
 def parse_daybook(xml_text: str) -> list[dict]:
     """
-    Return vouchers with signed 'amount' derived from party ledger line when possible.
-    Fields: vchtype, vchnumber, date, party, amount (signed), guid
+    Return vouchers with amounts separated into subtotal (pre-tax) and total (post-tax).
+    Fields: vchtype, vchnumber, date, party, amount (for backward compat), subtotal, total, guid
     """
     # Sanitize XML to remove invalid characters
     sanitized = sanitize_xml(xml_text)
@@ -58,23 +113,58 @@ def parse_daybook(xml_text: str) -> list[dict]:
     for v in root.findall(".//VOUCHER"):
         vchtype = v.get("VCHTYPE") or ""
         vchnumber = v.get("VCHNUMBER") or ""
-        guid = v.get("GUID") or ""
+        # Use GUID if available, otherwise use REMOTEID (Tally's unique voucher identifier)
+        guid = v.get("GUID") or v.get("REMOTEID") or ""
         d = parse_tally_date(v.findtext("DATE"))
         party = (v.findtext("PARTYLEDGERNAME") or "").strip()
 
-        amt = _party_line_amount_signed(v, party)
-        if amt is None:
-            amt = _fallback_amount_signed(v)
-        if amt == 0.0:
-            # last resort: header-level AMOUNT if present (often blank)
+        # For invoices, try to get both pre-tax (subtotal) and post-tax (total)
+        subtotal = 0.0
+        total = 0.0
+        
+        # Get inventory total (pre-tax for invoices)
+        amt_from_inventory = _inventory_total_amount(v)
+        
+        # Try to get post-tax amount from ledger entries (voucher-type aware)
+        amt_from_ledger = _party_line_amount_signed(v, party, vchtype)
+        if amt_from_ledger is None:
+            amt_from_ledger = _fallback_amount_signed(v, vchtype)
+        
+        # Also check bill allocation (works for most invoices)
+        amt_from_bill = _bill_allocation_amount(v)
+        
+        # Determine subtotal and total based on what's available
+        if amt_from_inventory and (amt_from_ledger or amt_from_bill):
+            # Invoice with both pre-tax and post-tax amounts
+            subtotal = amt_from_inventory  # Pre-tax from inventory
+            # Prefer ledger amount (more universal), fallback to bill allocation
+            total = abs(amt_from_ledger) if amt_from_ledger else amt_from_bill
+        elif amt_from_ledger:
+            # Has ledger amount but no inventory - use ledger for both
+            total = abs(amt_from_ledger)
+            subtotal = total  # No separate tax information
+        elif amt_from_bill:
+            # Has bill allocation but no inventory
+            total = amt_from_bill
+            subtotal = total  # No separate tax information
+        elif amt_from_inventory:
+            # Has inventory only (no post-tax found)
+            subtotal = amt_from_inventory
+            total = amt_from_inventory
+        else:
+            # Last resort: header-level AMOUNT
             amt = _to_float(v.findtext("AMOUNT"))
+            subtotal = amt
+            total = amt
 
         out.append({
             "vchtype": vchtype,
             "vchnumber": vchnumber,
             "date": d,
             "party": party,
-            "amount": amt,  # signed!
+            "amount": total,  # backward compatibility - use total
+            "subtotal": subtotal,  # pre-tax amount
+            "total": total,  # post-tax amount
             "guid": guid,
         })
     return out
