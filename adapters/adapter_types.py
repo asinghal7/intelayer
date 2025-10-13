@@ -27,6 +27,7 @@ class InvoiceLine(BaseModel):
 class Invoice(BaseModel):
     invoice_id: str
     voucher_key: str
+    vchtype: str                 # <-- NEW: store voucher type
     date: date
     customer_id: str
     sp_id: str | None = None

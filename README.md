@@ -30,4 +30,12 @@ Intelligent analytics layer for MSME ERPs — **Tally-first**. Extract via **HTT
 - Run tests:
   `pytest -q`
 
-These tests validate: (1) STATUS handling, (2) DayBook parsing, (3) empty responses.
+These tests validate: (1) STATUS handling, (2) DayBook parsing, (3) empty responses, (4) signed amount calculation.
+
+### After fixing 0-amounts
+- Apply migration:
+  - If using Docker:  
+    `cat warehouse/migrations/0002_add_vchtype.sql | docker exec -i ops-db-1 psql -U inteluser -d intelayer`
+- Run tests: `pytest -q`
+- Re-run ETL for today: `python agent/run.py`
+- In SQL or Metabase, you can now filter by `vchtype` and totals are **signed** (Sales +, Credit Note/Return -).

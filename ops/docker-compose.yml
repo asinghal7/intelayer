@@ -6,7 +6,14 @@ services:
       POSTGRES_USER: inteluser
       POSTGRES_PASSWORD: change_me
     ports: ["5432:5432"]
-    volumes: ["pgdata:/var/lib/postgresql/data"]
+    volumes: 
+      - pgdata:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U inteluser -d intelayer"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   metabase:
     image: metabase/metabase:latest
@@ -18,8 +25,13 @@ services:
       MB_DB_USER: inteluser
       MB_DB_PASS: change_me
       MB_DB_HOST: db
-    depends_on: ["db"]
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - mbdata:/metabase-data
 
 volumes:
   pgdata: {}
+  mbdata: {}
 
