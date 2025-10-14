@@ -19,7 +19,7 @@ from loguru import logger
 from pathlib import Path
 from adapters.tally_http.adapter import TallyHTTPAdapter
 from agent.settings import TALLY_URL, TALLY_COMPANY, DB_URL
-from agent.run import upsert_invoice
+from agent.run import upsert_invoice, upsert_receipt
 
 DAYBOOK_TEMPLATE = (
     Path(__file__).resolve().parents[1] / "adapters" / "tally_http" / "requests" / "daybook.xml.j2"
@@ -47,23 +47,33 @@ def backfill_date_range(start_date: date, end_date: date, dry_run: bool = False)
     adapter = TallyHTTPAdapter(TALLY_URL, TALLY_COMPANY, DAYBOOK_TEMPLATE, include_types=set())
     
     current = start_date
-    total_count = 0
+    total_invoices = 0
+    total_receipts = 0
     days_with_data = 0
     
     with psycopg.connect(DB_URL, autocommit=True) as conn:
         while current <= end_date:
             try:
-                day_count = 0
+                day_invoices = 0
+                day_receipts = 0
+                
                 # Fetch one day at a time (from_date = to_date)
+                # This caches the vouchers in the adapter
                 for inv in adapter.fetch_invoices(current, current):
                     upsert_invoice(conn, inv)
-                    day_count += 1
+                    day_invoices += 1
                 
-                total_count += day_count
+                # Extract receipts from cached data (no additional Tally request)
+                for rcpt in adapter.get_receipts_from_last_fetch():
+                    upsert_receipt(conn, rcpt)
+                    day_receipts += 1
                 
-                if day_count > 0:
+                total_invoices += day_invoices
+                total_receipts += day_receipts
+                
+                if day_invoices > 0 or day_receipts > 0:
                     days_with_data += 1
-                    logger.info(f"✓ {current}: {day_count} invoices")
+                    logger.info(f"✓ {current}: {day_invoices} invoices, {day_receipts} receipts")
                 else:
                     logger.debug(f"  {current}: no data")
                     
@@ -73,7 +83,7 @@ def backfill_date_range(start_date: date, end_date: date, dry_run: bool = False)
             
             current += timedelta(days=1)
     
-    logger.success(f"✓ Backfilled {total_count} invoices from {days_with_data} days")
+    logger.success(f"✓ Backfilled {total_invoices} invoices and {total_receipts} receipts from {days_with_data} days")
 
 
 def main():

@@ -54,15 +54,35 @@ def upsert_invoice(conn, inv):
             inv.subtotal, inv.tax, inv.total, inv.roundoff
         ))
 
-def log_run(conn, rows: int, status: str, err: str | None = None):
+def upsert_receipt(conn, rcpt):
+    """Insert or update a receipt in fact_receipt table."""
+    # First ensure the customer exists with master data
+    gstin = getattr(rcpt, "_customer_gstin", None)
+    pincode = getattr(rcpt, "_customer_pincode", None)
+    city = getattr(rcpt, "_customer_city", None)
+    
+    upsert_customer(conn, rcpt.customer_id, gstin, pincode, city)
+    
+    with conn.cursor() as cur:
+        cur.execute("""
+          insert into fact_receipt (receipt_key, date, customer_id, amount)
+          values (%s, %s, %s, %s)
+          on conflict (receipt_key) do update set
+            date=excluded.date,
+            customer_id=excluded.customer_id,
+            amount=excluded.amount
+        """, (rcpt.receipt_key, rcpt.date, rcpt.customer_id, rcpt.amount))
+
+def log_run(conn, stream_name: str, rows: int, status: str, err: str | None = None):
     with conn.cursor() as cur:
         cur.execute("insert into etl_logs(stream_name, rows, status, error) values(%s,%s,%s,%s)",
-                    ("invoices", rows, status, err))
+                    (stream_name, rows, status, err))
 
 def main():
     # Pass empty set to include ALL voucher types (Sales, Receipt, Payment, Journal, etc.)
     adapter = TallyHTTPAdapter(TALLY_URL, TALLY_COMPANY, DAYBOOK_TEMPLATE, include_types=set())
     with psycopg.connect(DB_URL, autocommit=True) as conn:
+        # Process invoices (ALL vouchers go to fact_invoice)
         try:
             last = get_checkpoint(conn, "invoices")
             start = last - timedelta(days=1)  # overlap for late edits
@@ -75,10 +95,29 @@ def main():
                   insert into etl_checkpoints(stream_name,last_date) values('invoices', %s)
                   on conflict(stream_name) do update set last_date=excluded.last_date, updated_at=now()
                 """, (end,))
-            log_run(conn, count, "ok")
+            log_run(conn, "invoices", count, "ok")
             logger.info(f"Invoices upserted: {count}")
         except Exception as e:
-            log_run(conn, 0, "error", str(e))
+            log_run(conn, "invoices", 0, "error", str(e))
+            raise
+        
+        # ADDITIONALLY process receipts from cached data (no additional Tally request)
+        try:
+            receipt_count = 0
+            for rcpt in adapter.get_receipts_from_last_fetch():
+                upsert_receipt(conn, rcpt)
+                receipt_count += 1
+            
+            # Update receipts checkpoint
+            with conn.cursor() as cur:
+                cur.execute("""
+                  insert into etl_checkpoints(stream_name,last_date) values('receipts', %s)
+                  on conflict(stream_name) do update set last_date=excluded.last_date, updated_at=now()
+                """, (end,))
+            log_run(conn, "receipts", receipt_count, "ok")
+            logger.info(f"Receipts upserted: {receipt_count}")
+        except Exception as e:
+            log_run(conn, "receipts", 0, "error", str(e))
             raise
 
 if __name__ == "__main__":

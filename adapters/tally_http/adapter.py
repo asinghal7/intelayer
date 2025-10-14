@@ -1,7 +1,7 @@
 from __future__ import annotations
 from datetime import date
 from jinja2 import Template
-from adapters.adapter_types import Invoice
+from adapters.adapter_types import Invoice, Receipt
 from .client import TallyClient
 from .parser import parse_daybook
 import hashlib
@@ -51,10 +51,15 @@ class TallyHTTPAdapter:
             self.include_types = {"Sales", "Credit Note", "Sales Return"}
         else:
             self.include_types = include_types
+        # Cache for storing last fetched vouchers (to reuse for receipts)
+        self._last_vouchers_cache = []
 
     def fetch_invoices(self, since: date, to: date):
         xml = _render(self.daybook_template, from_date=since, to_date=to, company=self.client.company)
-        for d in parse_daybook(self.client.post_xml(xml)):
+        # Parse and cache vouchers for potential reuse (e.g., for receipts)
+        self._last_vouchers_cache = list(parse_daybook(self.client.post_xml(xml)))
+        
+        for d in self._last_vouchers_cache:
             # Skip filtering if include_types is empty (include all)
             if self.include_types and d["vchtype"] not in self.include_types:
                 continue
@@ -89,3 +94,35 @@ class TallyHTTPAdapter:
             invoice.__dict__["_customer_city"] = d.get("party_city")
             
             yield invoice
+    
+    def get_receipts_from_last_fetch(self):
+        """Extract Receipt vouchers from the cached data (last fetch_invoices call).
+        
+        This reuses the XML response that was already fetched by fetch_invoices(),
+        avoiding an additional Tally request.
+        
+        Yields:
+            Receipt: Receipt objects for vouchers with vchtype='Receipt'
+        """
+        for d in self._last_vouchers_cache:
+            # Only process Receipt voucher types
+            if d["vchtype"] != "Receipt":
+                continue
+            
+            # For receipts, use the total amount
+            amount = float(d.get("total") or 0.0)
+            
+            # Create receipt with customer details
+            receipt = Receipt(
+                receipt_key=_voucher_key(d),
+                date=d["date"],
+                customer_id=d.get("party","") or "UNKNOWN",
+                amount=amount,
+            )
+            
+            # Attach customer master data (same pattern as invoices)
+            receipt.__dict__["_customer_gstin"] = d.get("party_gstin")
+            receipt.__dict__["_customer_pincode"] = d.get("party_pincode")
+            receipt.__dict__["_customer_city"] = d.get("party_city")
+            
+            yield receipt
