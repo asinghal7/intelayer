@@ -66,7 +66,9 @@ class TallyHTTPAdapter:
             # Calculate tax as difference between total and subtotal
             tax = total - subtotal
             
-            yield Invoice(
+            # Create invoice with embedded customer details
+            # Store customer details in a special attribute for upsert
+            invoice = Invoice(
                 invoice_id=_voucher_key(d),
                 voucher_key=_voucher_key(d),
                 vchtype=d["vchtype"],
@@ -79,3 +81,11 @@ class TallyHTTPAdapter:
                 roundoff=0.0,
                 lines=[],
             )
+            
+            # Attach customer master data as extra attributes (not part of Invoice model)
+            # This will be used by upsert_customer function
+            invoice.__dict__["_customer_gstin"] = d.get("party_gstin")
+            invoice.__dict__["_customer_pincode"] = d.get("party_pincode")
+            invoice.__dict__["_customer_city"] = d.get("party_city")
+            
+            yield invoice

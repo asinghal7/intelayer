@@ -104,7 +104,8 @@ def _inventory_total_amount(voucher: etree._Element) -> float:
 def parse_daybook(xml_text: str) -> list[dict]:
     """
     Return vouchers with amounts separated into subtotal (pre-tax) and total (post-tax).
-    Fields: vchtype, vchnumber, date, party, amount (for backward compat), subtotal, total, guid
+    Fields: vchtype, vchnumber, date, party, amount (for backward compat), subtotal, total, guid, 
+            party_gstin, party_pincode, party_city
     """
     # Sanitize XML to remove invalid characters
     sanitized = sanitize_xml(xml_text)
@@ -117,6 +118,20 @@ def parse_daybook(xml_text: str) -> list[dict]:
         guid = v.get("GUID") or v.get("REMOTEID") or ""
         d = parse_tally_date(v.findtext("DATE"))
         party = (v.findtext("PARTYLEDGERNAME") or "").strip()
+        
+        # Extract party/customer master details
+        # Try multiple possible XML paths where Tally might store this info
+        party_gstin = (v.findtext("PARTYGSTIN") or 
+                      v.findtext(".//PARTYGSTIN") or 
+                      v.findtext(".//BASICBUYERPARTYGSTIN") or "").strip()
+        
+        party_pincode = (v.findtext("PARTYPINCODE") or 
+                        v.findtext(".//PARTYPINCODE") or 
+                        v.findtext(".//BASICBUYERPINCODE") or "").strip()
+        
+        party_city = (v.findtext("PARTYCITY") or 
+                     v.findtext(".//PARTYCITY") or 
+                     v.findtext(".//BASICBUYERSTATE") or "").strip()
 
         # For invoices, try to get both pre-tax (subtotal) and post-tax (total)
         subtotal = 0.0
@@ -166,5 +181,8 @@ def parse_daybook(xml_text: str) -> list[dict]:
             "subtotal": subtotal,  # pre-tax amount
             "total": total,  # post-tax amount
             "guid": guid,
+            "party_gstin": party_gstin if party_gstin else None,
+            "party_pincode": party_pincode if party_pincode else None,
+            "party_city": party_city if party_city else None,
         })
     return out

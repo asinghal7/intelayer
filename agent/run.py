@@ -14,18 +14,28 @@ def get_checkpoint(conn, stream: str) -> date:
         fy_start = date(date.today().year if date.today().month>=4 else date.today().year-1, 4, 1)
         return row[0] if row and row[0] else fy_start
 
-def upsert_customer(conn, customer_id: str):
-    """Ensure customer exists in dim_customer before inserting invoice."""
+def upsert_customer(conn, customer_id: str, gstin: str | None = None, 
+                   pincode: str | None = None, city: str | None = None):
+    """Ensure customer exists in dim_customer before inserting invoice.
+    Updates GSTIN, pincode, and city if provided and not already set."""
     with conn.cursor() as cur:
         cur.execute("""
-          insert into dim_customer (customer_id, name)
-          values (%s, %s)
-          on conflict (customer_id) do nothing
-        """, (customer_id, customer_id))
+          insert into dim_customer (customer_id, name, gstin, pincode, city)
+          values (%s, %s, %s, %s, %s)
+          on conflict (customer_id) do update set
+            gstin = COALESCE(excluded.gstin, dim_customer.gstin),
+            pincode = COALESCE(excluded.pincode, dim_customer.pincode),
+            city = COALESCE(excluded.city, dim_customer.city)
+        """, (customer_id, customer_id, gstin, pincode, city))
 
 def upsert_invoice(conn, inv):
-    # First ensure the customer exists
-    upsert_customer(conn, inv.customer_id)
+    # First ensure the customer exists with master data
+    # Extract customer details from invoice attributes if available
+    gstin = getattr(inv, "_customer_gstin", None)
+    pincode = getattr(inv, "_customer_pincode", None)
+    city = getattr(inv, "_customer_city", None)
+    
+    upsert_customer(conn, inv.customer_id, gstin, pincode, city)
     
     with conn.cursor() as cur:
         cur.execute("""
