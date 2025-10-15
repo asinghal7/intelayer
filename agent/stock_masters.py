@@ -407,6 +407,59 @@ def _filter_by_brands(groups: list[dict], items: list[dict], brand_names: list[s
     return kept_groups, kept_items
 
 
+def clear_stock_master(conn, brands_filter: list[str], dry_run: bool = False) -> dict:
+    """Clear stock master data; if brands_filter provided, clear only those brand subtrees.
+
+    Returns counts of deleted rows.
+    """
+    deleted_groups = 0
+    deleted_items = 0
+    with conn.cursor() as cur:
+        if brands_filter:
+            # Build recursive set of groups under the selected brand roots
+            cur.execute(
+                """
+                with recursive grp as (
+                  select name, parent_name
+                  from dim_stock_group
+                  where parent_name is null and lower(name) = any(%s)
+                  union all
+                  select g.name, g.parent_name
+                  from dim_stock_group g
+                  join grp on g.parent_name = grp.name
+                )
+                select name from grp
+                """,
+                ([b.strip().lower() for b in brands_filter],),
+            )
+            group_names = [r[0] for r in cur.fetchall()]
+            if not group_names:
+                return {"groups": 0, "items": 0}
+            if dry_run:
+                return {"groups": len(group_names), "items": 0}
+            # Delete items first, then groups
+            cur.execute(
+                "delete from dim_item where parent_name = any(%s) or lower(brand) = any(%s)",
+                (group_names, [b.strip().lower() for b in brands_filter]),
+            )
+            deleted_items = cur.rowcount
+            cur.execute("delete from dim_stock_group where name = any(%s)", (group_names,))
+            deleted_groups = cur.rowcount
+        else:
+            if dry_run:
+                # Return prospective counts
+                cur.execute("select count(*) from dim_item")
+                di = cur.fetchone()[0]
+                cur.execute("select count(*) from dim_stock_group")
+                dg = cur.fetchone()[0]
+                return {"groups": dg, "items": di}
+            cur.execute("delete from dim_item")
+            deleted_items = cur.rowcount
+            cur.execute("delete from dim_stock_group")
+            deleted_groups = cur.rowcount
+    return {"groups": deleted_groups, "items": deleted_items}
+
+
 def export_to_csv(conn, csv_path: str):
     """Export items with brands to CSV."""
     with conn.cursor() as cur:
@@ -439,6 +492,8 @@ def main():
     preview_limit = 50
     export_csv_path = None
     brands_filter: list[str] = []
+    clear_reload = False
+    clear_only = False
     
     i = 1
     while i < len(sys.argv):
@@ -461,6 +516,12 @@ def main():
         elif arg == "--brands" and i + 1 < len(sys.argv):
             brands_filter = [s for s in sys.argv[i + 1].split(",")]
             i += 2
+        elif arg == "--clear-reload":
+            clear_reload = True
+            i += 1
+        elif arg == "--clear-only":
+            clear_only = True
+            i += 1
         else:
             i += 1
     
@@ -524,6 +585,14 @@ def main():
     
     # Connect to DB and load data
     with psycopg.connect(DB_URL, autocommit=True) as conn:
+        # Optional clear/clear-reload
+        if clear_only or clear_reload:
+            logger.info("Clearing existing stock master data...")
+            deleted = clear_stock_master(conn, brands_filter, dry_run)
+            logger.success(f"Deleted groups={deleted['groups']}, items={deleted['items']}")
+            if clear_only:
+                return
+
         logger.info("Ensuring schema exists...")
         ensure_schema(conn)
         
