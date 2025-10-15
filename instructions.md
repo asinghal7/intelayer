@@ -1,351 +1,253 @@
-I want to fix the **0-amount problem** where my metabase db is showing amount as 0 for all fact invoice rows through the following plan which - (by computing the signed amount from the party ledger line), preserves **polarity**, and adds a small schema + ETL tweak so your dashboards can filter by **voucher type**. Don’t touch `.venv` or other unlisted files. Ensure previous fixes don't get disrupted due to this fix, hence implement the below carefully, making intelligent choices.
 
----
+You are extending an existing Python + Postgres ETL that already syncs invoice-level customers from Tally over HTTP. 
+Implement a minimal, SAFE Phase-1 stock-master using the *same codebase*, with **no breaking changes** to existing flows.
 
-Create/overwrite the following files:
+# Scope (Phase-1 only)
+- Parse Tally’s **Masters export XML** (the same file produced by: Master → Stock Groups → Include dependent masters = Yes). 
+- Ingest **Stock Groups** as the authoritative hierarchy; treat **root group** as “brand”.
+- If the XML also contains **Stock Items**, ingest basic item fields (name, parent, units, HSN) to a dim table. If items are NOT present, just load groups now; we’ll add items via “List of Stock Items”/HTTP later.
+- Load **Units** (dependent masters) for UOM mapping when present.
+- Provide **two input modes**:
+  1) `--from-file Master.xml` (use the uploaded XML)
+  2) `--from-tally "<Company Name>"` (perform the HTTP Export call with built-in reports; still no TDL).
+- Ship with **dry-run**, **preview**, and **validation SQL** so the user (me) can check & approve before we switch it on.
 
-```
-adapters/adapter_types.py
-adapters/tally_http/parser.py
-adapters/tally_http/adapter.py
-agent/run.py
-warehouse/migrations/0002_add_vchtype.sql
-tests/fixtures/daybook_header_empty_with_lines.xml
-tests/test_amount_signed_and_party_line.py
-README.md (append a short note)
-```
+# Reuse
+- Reuse existing DB adapter patterns (e.g., adapter.py) for connections/transactions/logs.
+- Reuse CLI structure in run.py (add a new subcommand rather than editing current invoice commands).
 
----
+# Files to add
+1) sql/0002_stock_master_from_xml.sql
+2) etl/stock_master_from_xml.py
+3) Update run.py to register a `stockmaster` subcommand.
+4) If needed, add lxml & requests to requirements.
 
-**File: `adapters/adapter_types.py`** (add `vchtype` to `Invoice`)
-
-```python
-from typing import Protocol, Iterable
-from pydantic import BaseModel
-from datetime import date
-
-class Customer(BaseModel):
-    customer_id: str
-    name: str
-    gstin: str | None = None
-    city: str | None = None
-    pincode: str | None = None
-
-class Item(BaseModel):
-    item_id: str
-    sku: str | None = None
-    name: str
-    brand: str | None = None
-    hsn: str | None = None
-    uom: str | None = None
-
-class InvoiceLine(BaseModel):
-    item_id: str
-    qty: float
-    rate: float
-    line_total: float
-    tax: float | None = None
-
-class Invoice(BaseModel):
-    invoice_id: str
-    voucher_key: str
-    vchtype: str                 # <-- NEW: store voucher type
-    date: date
-    customer_id: str
-    sp_id: str | None = None
-    subtotal: float
-    tax: float
-    total: float
-    roundoff: float | None = 0.0
-    lines: list[InvoiceLine]
-
-class Receipt(BaseModel):
-    receipt_key: str
-    date: date
-    customer_id: str
-    amount: float
-
-class ERPAdapter(Protocol):
-    def fetch_customers(self, since: date | None) -> Iterable[Customer]: ...
-    def fetch_items(self, since: date | None) -> Iterable[Item]: ...
-    def fetch_invoices(self, since: date, to: date) -> Iterable[Invoice]: ...
-    def fetch_receipts(self, since: date, to: date) -> Iterable[Receipt]: ...
-```
-
----
-
-**File: `adapters/tally_http/parser.py`** (robust signed amount from PARTY line; no `abs()` baked in)
-
-```python
-from __future__ import annotations
-from lxml import etree
-from datetime import datetime, date
-
-def parse_tally_date(s: str | None) -> date:
-    if not s:
-        return date.today()
-    s = s.strip()
-    for fmt in ("%Y%m%d", "%Y-%m-%d", "%d-%b-%Y"):
-        try:
-            return datetime.strptime(s, fmt).date()
-        except ValueError:
-            continue
-    return date.today()
-
-def _to_float(x: str | None) -> float:
-    if not x:
-        return 0.0
-    x = x.replace(",", "").strip()
-    neg = x.startswith("(") and x.endswith(")")
-    if neg:
-        x = x[1:-1]
-    try:
-        val = float(x or 0.0)
-    except ValueError:
-        val = 0.0
-    return -val if neg else val
-
-def _party_line_amount_signed(voucher: etree._Element, party_name: str) -> float | None:
-    party = (party_name or "").strip().lower()
-    for le in voucher.findall(".//ALLLEDGERENTRIES.LIST"):
-        lname = (le.findtext("LEDGERNAME") or "").strip().lower()
-        if lname == party:
-            return _to_float(le.findtext("AMOUNT"))  # keep sign
-    return None
-
-def _fallback_amount_signed(voucher: etree._Element) -> float:
-    # choose the line with largest magnitude; keep its original sign
-    best_val = 0.0
-    best_abs = 0.0
-    for le in voucher.findall(".//ALLLEDGERENTRIES.LIST"):
-        v = _to_float(le.findtext("AMOUNT"))
-        if abs(v) > best_abs:
-            best_abs = abs(v)
-            best_val = v
-    return best_val
-
-def parse_daybook(xml_text: str) -> list[dict]:
-    """
-    Return vouchers with signed 'amount' derived from party ledger line when possible.
-    Fields: vchtype, vchnumber, date, party, amount (signed), guid
-    """
-    root = etree.fromstring(xml_text.encode("utf-8"))
-    out: list[dict] = []
-    for v in root.findall(".//VOUCHER"):
-        vchtype = v.get("VCHTYPE") or ""
-        vchnumber = v.get("VCHNUMBER") or ""
-        guid = v.get("GUID") or ""
-        d = parse_tally_date(v.findtext("DATE"))
-        party = (v.findtext("PARTYLEDGERNAME") or "").strip()
-
-        amt = _party_line_amount_signed(v, party)
-        if amt is None:
-            amt = _fallback_amount_signed(v)
-        if amt == 0.0:
-            # last resort: header-level AMOUNT if present (often blank)
-            amt = _to_float(v.findtext("AMOUNT"))
-
-        out.append({
-            "vchtype": vchtype,
-            "vchnumber": vchnumber,
-            "date": d,
-            "party": party,
-            "amount": amt,  # signed!
-            "guid": guid,
-        })
-    return out
-```
-
----
-
-**File: `adapters/tally_http/adapter.py`** (feed `vchtype` into Invoice; default include Sales + CN/SR)
-
-```python
-from __future__ import annotations
-from datetime import date
-from jinja2 import Template
-from adapters.adapter_types import Invoice
-from .client import TallyClient
-from .parser import parse_daybook
-
-def _render(template_str: str, *, from_date: date, to_date: date, company: str) -> str:
-    return Template(template_str).render(
-        from_date=from_date.strftime("%d-%b-%Y"),
-        to_date=to_date.strftime("%d-%b-%Y"),
-        company=company,
-    )
-
-def _voucher_key(d: dict) -> str:
-    return d.get("guid") or f"{d.get('vchtype','')}/{d.get('vchnumber','')}/{d.get('date','')}/{d.get('party','')}"
-
-class TallyHTTPAdapter:
-    def __init__(self, url: str, company: str, daybook_template: str, include_types: set[str] | None = None):
-        self.client = TallyClient(url, company)
-        self.daybook_template = daybook_template
-        # Include common sales document types; adjust later if needed
-        self.include_types = include_types or {"Sales", "Credit Note", "Sales Return"}
-
-    def fetch_invoices(self, since: date, to: date):
-        xml = _render(self.daybook_template, from_date=since, to_date=to, company=self.client.company)
-        for d in parse_daybook(self.client.post_xml(xml)):
-            if d["vchtype"] not in self.include_types:
-                continue
-            amt = float(d.get("amount") or 0.0)  # signed
-            yield Invoice(
-                invoice_id=_voucher_key(d),
-                voucher_key=_voucher_key(d),
-                vchtype=d["vchtype"],
-                date=d["date"],
-                customer_id=d.get("party","") or "UNKNOWN",
-                sp_id=None,
-                subtotal=amt,
-                tax=0.0,
-                total=amt,
-                roundoff=0.0,
-                lines=[],
-            )
-```
-
----
-
-**File: `agent/run.py`** (upsert `vchtype` too)
-
-```python
-from datetime import date, timedelta
-import psycopg
-from loguru import logger
-from pathlib import Path
-from adapters.tally_http.adapter import TallyHTTPAdapter
-from agent.settings import TALLY_URL, TALLY_COMPANY, DB_URL
-
-DAYBOOK_TEMPLATE = (Path(__file__).resolve().parents[1] / "adapters" / "tally_http" / "requests" / "daybook.xml.j2").read_text(encoding="utf-8")
-
-def get_checkpoint(conn, stream: str) -> date:
-    with conn.cursor() as cur:
-        cur.execute("select last_date from etl_checkpoints where stream_name=%s", (stream,))
-        row = cur.fetchone()
-        fy_start = date(date.today().year if date.today().month>=4 else date.today().year-1, 4, 1)
-        return row[0] if row and row[0] else fy_start
-
-def upsert_invoice(conn, inv):
-    with conn.cursor() as cur:
-        cur.execute("""
-          insert into fact_invoice (invoice_id, voucher_key, vchtype, date, customer_id, sp_id, subtotal, tax, total, roundoff)
-          values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-          on conflict (invoice_id) do update set
-            vchtype=excluded.vchtype,
-            date=excluded.date,
-            customer_id=excluded.customer_id,
-            subtotal=excluded.subtotal,
-            tax=excluded.tax,
-            total=excluded.total,
-            roundoff=excluded.roundoff
-        """, (
-            inv.invoice_id, inv.voucher_key, inv.vchtype, inv.date, inv.customer_id, inv.sp_id,
-            inv.subtotal, inv.tax, inv.total, inv.roundoff
-        ))
-
-def log_run(conn, rows: int, status: str, err: str | None = None):
-    with conn.cursor() as cur:
-        cur.execute("insert into etl_logs(stream_name, rows, status, error) values(%s,%s,%s,%s)",
-                    ("invoices", rows, status, err))
-
-def main():
-    adapter = TallyHTTPAdapter(TALLY_URL, TALLY_COMPANY, DAYBOOK_TEMPLATE)
-    with psycopg.connect(DB_URL, autocommit=True) as conn:
-        try:
-            last = get_checkpoint(conn, "invoices")
-            start = last - timedelta(days=1)  # overlap for late edits
-            end = date.today()
-            count = 0
-            for inv in adapter.fetch_invoices(start, end):
-                upsert_invoice(conn, inv); count += 1
-            with conn.cursor() as cur:
-                cur.execute("""
-                  insert into etl_checkpoints(stream_name,last_date) values('invoices', %s)
-                  on conflict(stream_name) do update set last_date=excluded.last_date, updated_at=now()
-                """, (end,))
-            log_run(conn, count, "ok")
-            logger.info(f"Invoices upserted: {count}")
-        except Exception as e:
-            log_run(conn, 0, "error", str(e))
-            raise
-
-if __name__ == "__main__":
-    main()
-```
-
----
-
-**File: `warehouse/migrations/0002_add_vchtype.sql`** (schema tweak for filtering/analytics)
+# 1) sql/0002_stock_master_from_xml.sql
+Create idempotent objects. Do not break existing facts. Use separate dim tables for clarity.
 
 ```sql
-alter table fact_invoice
-  add column if not exists vchtype text;
+-- Stock group hierarchy (authoritative)
+create table if not exists dim_stock_group (
+  stock_group_id bigserial primary key,
+  guid           text unique,
+  name           text not null unique,
+  parent_name    text,
+  alter_id       bigint,
+  updated_at     timestamptz default now()
+);
 
-create index if not exists idx_fact_invoice_vchtype on fact_invoice(vchtype);
+create index if not exists idx_dim_stock_group_parent on dim_stock_group(parent_name);
+
+-- Optional: units catalog from dependent masters (if present)
+create table if not exists dim_uom (
+  uom_name       text primary key,
+  original_name  text,
+  gst_rep_uom    text,
+  is_simple      boolean,
+  alter_id       bigint,
+  updated_at     timestamptz default now()
+);
+
+-- Basic SKU table for Phase-1 (only if you don’t already have a dim_item/dim_sku)
+-- If you already have one, adapt the UPSERTs in the Python file to write there.
+create table if not exists dim_sku (
+  sku_id     bigserial primary key,
+  guid       text unique,
+  sku_name   text not null,
+  parent_name text,
+  uom        text,
+  hsn        text,
+  brand_name text,         -- computed = root stock group
+  updated_at timestamptz default now(),
+  unique (sku_name, parent_name)
+);
+
+create index if not exists idx_dim_sku_brand on dim_sku(brand_name);
+````
+
+# 2) etl/stock_master_from_xml.py
+
+Requirements: lxml, requests (for live export), and your existing adapter for DB.
+
+## Behavior
+
+* CLI:
+
+  * `python -m etl.stock_master_from_xml stockmaster --from-file Master.xml --dry-run --preview 50`
+  * `python -m etl.stock_master_from_xml stockmaster --from-tally "Ashirvad Sales (23-24/24-25)" --preview 100`
+  * Common flags: `--export-csv out.csv`
+* Steps:
+
+  1. Ensure schema `sql/0002_stock_master_from_xml.sql`.
+  2. Obtain XML:
+
+     * If `--from-file`, read local file.
+     * If `--from-tally`, POST the “All Masters” (or “List of Stock Groups”) built-in export:
+
+       * ReportName: `All Masters` OR `List of Stock Groups` (XML), with `<SVCURRENTCOMPANY>`.
+  3. Parse:
+
+     * **Units**: `<UNIT>` → NAME, ORIGINALNAME, GSTREPUOM, ISSIMPLEUNIT, ALTERID.
+     * **Stock Groups**: `<STOCKGROUP>` → NAME, PARENT (empty/null for root), GUID, ALTERID.
+     * **Stock Items** (if present): `<STOCKITEM>` → NAME, PARENT (immediate group), BASEUNITS, HSNCODE/HSNDETAILS (when present), GUID.
+  4. Dry-run mode builds in-memory rows and prints counts + sample preview; real mode UPSERTs:
+
+     * `dim_stock_group`: upsert by GUID (fallback name).
+     * `dim_uom`: upsert by uom_name.
+     * `dim_sku`: if items parsed, upsert by GUID (fallback sku_name + parent_name). Keep non-null existing values unless replaced with non-empty new values.
+  5. Compute **brand_name** for every SKU by walking `dim_stock_group` upwards from `parent_name` until root.
+  6. Preview: sample table (brand_name, sku_name, uom, hsn). Optionally CSV.
+
+## UPSERT SQL (write exactly; use adapter’s parameterization)
+
+-- Groups (GUID-first, fallback name)
+
+```sql
+insert into dim_stock_group (guid, name, parent_name, alter_id, updated_at)
+values ($1,$2,$3,$4, now())
+on conflict (guid) do update
+  set name=excluded.name, parent_name=excluded.parent_name,
+      alter_id=excluded.alter_id, updated_at=now();
+
+insert into dim_stock_group (name, parent_name, alter_id, updated_at)
+values ($1,$2,$3, now())
+on conflict (name) do update
+  set parent_name=excluded.parent_name, alter_id=excluded.alter_id, updated_at=now();
+```
+
+-- Units
+
+```sql
+insert into dim_uom (uom_name, original_name, gst_rep_uom, is_simple, alter_id, updated_at)
+values ($1,$2,$3,$4,$5, now())
+on conflict (uom_name) do update
+  set original_name=excluded.original_name,
+      gst_rep_uom=excluded.gst_rep_uom,
+      is_simple=excluded.is_simple,
+      alter_id=excluded.alter_id,
+      updated_at=now();
+```
+
+-- SKUs (only if <STOCKITEM> exists in the XML)
+
+```sql
+insert into dim_sku (guid, sku_name, parent_name, uom, hsn, updated_at)
+values ($1,$2,$3,$4,$5, now())
+on conflict (guid) do update
+  set sku_name=excluded.sku_name,
+      parent_name=excluded.parent_name,
+      uom = coalesce(nullif(excluded.uom,''), dim_sku.uom),
+      hsn = coalesce(nullif(excluded.hsn,''), dim_sku.hsn),
+      updated_at=now();
+
+insert into dim_sku (sku_name, parent_name, uom, hsn, updated_at)
+values ($1,$2,$3,$4, now())
+on conflict (sku_name, parent_name) do update
+  set uom = coalesce(nullif(excluded.uom,''), dim_sku.uom),
+      hsn = coalesce(nullif(excluded.hsn,''), dim_sku.hsn),
+      updated_at=now();
+```
+
+-- Compute brand = root group (works even with variable depths)
+
+```sql
+with recursive grp as (
+  select s.sku_id, g.name as group_name, g.parent_name, 1 as depth
+  from dim_sku s
+  left join dim_stock_group g on g.name = s.parent_name
+  union all
+  select grp.sku_id, g2.name, g2.parent_name, grp.depth + 1
+  from grp
+  join dim_stock_group g2 on g2.name = grp.parent_name
+),
+root as (
+  select sku_id,
+         (array_agg(group_name order by case when parent_name is null then 0 else 1 end, depth asc))[1] as root_group
+  from grp
+  group by sku_id
+)
+update dim_sku s
+set brand_name = coalesce(r.root_group, s.parent_name)
+from root r
+where r.sku_id = s.sku_id
+  and coalesce(s.brand_name,'') <> coalesce(r.root_group, s.parent_name,'');
+```
+
+## Parser notes
+
+* Map empty tags to NULL; `.text.strip()` where applicable.
+* For **HSN**: prefer the latest `<HSNDETAILS.LIST>` with `<HSNCODE>` if multiple appear; else take first non-empty.
+* For **UOM**: take `<BASEUNITS>` on item; if empty, try to map from `dim_uom` if name matches.
+* GUID may be absent on some groups/items; the fallback uniqueness is `name` (groups) and `(sku_name, parent_name)` (items).
+
+## Preview (interim check)
+
+* When dry-run or after real run, show:
+
+  * Counts: groups parsed, units parsed, items parsed; upserts (inserted/updated) if not dry-run.
+  * If items present: a table of `brand_name, sku_name, uom, hsn` limited by `--preview N`.
+  * If items NOT present: show **group tree** sample: root groups and a few children to verify hierarchy.
+
+SQL helpers for me to review:
+
+```sql
+-- 1) Totals
+select (select count(*) from dim_stock_group) as groups,
+       (select count(*) from dim_uom) as uoms,
+       (select count(*) from dim_sku) as skus,
+       (select count(distinct brand_name) from dim_sku where brand_name is not null) as brands;
+
+-- 2) Sample of SKUs (if present)
+select brand_name, sku_name, uom, hsn
+from dim_sku
+order by brand_name nulls last, sku_name
+limit 50;
+
+-- 3) If no SKUs in XML, show a peek of group roots & children
+select g.name as root, c.name as child
+from dim_stock_group g
+left join dim_stock_group c on c.parent_name = g.name
+where g.parent_name is null
+order by g.name, c.name
+limit 50;
+```
+
+# 3) run.py integration
+
+* Add a subcommand:
+
+  * `python run.py stockmaster --from-file Master.xml --dry-run --preview 50`
+  * `python run.py stockmaster --from-tally "Ashirvad Sales (23-24/24-25)" --preview 100`
+* Delegate to `etl/stock_master_from_xml.py`.
+
+# 4) Requirements
+
+* Ensure these exist (add if missing):
+
+  * lxml
+  * requests
+
+# Implementation constraints
+
+* Keep functions small: `load_xml_file()`, `fetch_export_http(company)`, `parse_units()`, `parse_groups()`, `parse_items_if_any()`, `upsert_groups()`, `upsert_units()`, `upsert_items()`, `compute_brands()`, `preview()`.
+* Clean logs, clear exceptions for malformed XML.
+* No changes to existing invoice ingestion.
+* Idempotent migrations and upserts.
+
+# Final developer checklist (print at end of run)
+
+* Show whether SKUs were found in the XML. If not, suggest running the live “List of Stock Items” export later.
+* Show distinct count of root groups (brands).
+* If any item parent group is missing in dim_stock_group, log the item and skip brand computation for that row.
+
 ```
 
 ---
 
-**File: `tests/fixtures/daybook_header_empty_with_lines.xml`**
-
-```xml
-<ENVELOPE>
-  <HEADER><VERSION>1</VERSION><STATUS>1</STATUS></HEADER>
-  <BODY><DATA><TALLYMESSAGE>
-    <VOUCHER VCHTYPE="Sales" VCHNUMBER="S-200" GUID="guid-200">
-      <DATE>20251012</DATE>
-      <PARTYLEDGERNAME>Acme Distributors</PARTYLEDGERNAME>
-      <!-- No header-level AMOUNT -->
-      <ALLLEDGERENTRIES.LIST>
-        <LEDGERNAME>Sales A/c</LEDGERNAME>
-        <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
-        <AMOUNT>-1234.50</AMOUNT>
-      </ALLLEDGERENTRIES.LIST>
-      <ALLLEDGERENTRIES.LIST>
-        <LEDGERNAME>Acme Distributors</LEDGERNAME>
-        <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
-        <AMOUNT>1234.50</AMOUNT>
-      </ALLLEDGERENTRIES.LIST>
-    </VOUCHER>
-  </TALLYMESSAGE></DATA></BODY>
-</ENVELOPE>
+### How we’ll validate together
+1) Run: `python run.py stockmaster --from-file Master.xml --dry-run --preview 50`  
+   Paste me the first ~10 rows of the preview (or the root/child group peek if no SKUs present).
+2) If structure looks right, run without `--dry-run`, then share:
+   - totals, distinct brand count, and a couple of known SKUs/brands for spot checks.
+3) If any brand looks off, we’ll tweak the “brand = root” logic (e.g., pin a specific ancestor level for certain families).
 ```
-
----
-
-**File: `tests/test_amount_signed_and_party_line.py`**
-
-```python
-from pathlib import Path
-from adapters.tally_http.parser import parse_daybook
-
-def test_amount_from_party_line_signed():
-    xml = (Path(__file__).parent / "fixtures" / "daybook_header_empty_with_lines.xml").read_text(encoding="utf-8")
-    rows = parse_daybook(xml)
-    assert len(rows) == 1
-    r = rows[0]
-    assert r["vchtype"] == "Sales"
-    assert r["vchnumber"] == "S-200"
-    assert r["party"] == "Acme Distributors"
-    # Should pick party ledger line with sign preserved (Sales -> customer debit -> +)
-    assert r["amount"] == 1234.50
-```
-
----
-
-**Update (append) to: `README.md`**
-
-```md
-### After fixing 0-amounts
-- Apply migration:
-  - If using Docker:  
-    `docker compose -f ops/docker-compose.yml cp warehouse/migrations/0002_add_vchtype.sql db:/tmp/0002_add_vchtype.sql`  
-    `docker compose -f ops/docker-compose.yml exec db psql -U inteluser -d intelayer -f /tmp/0002_add_vchtype.sql`
-- Run tests: `pytest -q`
-- Re-run ETL for today: `python agent/run.py`
-- In SQL or Metabase, you can now filter by `vchtype` and totals are **signed** (Sales +, Credit Note/Return -).
-```
-
-**END OF PROMPT**

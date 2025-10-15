@@ -1,3 +1,34 @@
+## Stock Master Phase-1 – Fix Summary
+
+### What was added
+- Tally HTTP export for masters using Export/Data:
+  - All Masters (groups)
+  - List of Accounts with AccountType=Units and AccountType=Stock Items
+- Parser support to ingest stock groups, units (UOM), and items, computing brand as root group.
+- CLI `agent.stock_masters` with:
+  - `--from-tally` (primary), `--brands` filter, `--dry-run`, `--preview`, `--export-csv`
+- Migration `0005_brand_flag.sql` adding `is_brand` flag to `dim_stock_group` and backfilling roots.
+
+### What changed (DB)
+- `dim_stock_group`: new column `is_brand boolean default false`, backfilled for root groups (no parent).
+- No breaking changes to existing invoice flows.
+
+### How to run
+```
+python -m agent.stock_masters --from-tally --brands "Whirlpool,Voltas,V-Guard Industries Ltd" --preview 50
+```
+
+### Validation SQL
+```
+select count(*) from dim_stock_group;
+select count(*) from dim_uom;
+select count(*) from dim_item;
+select name from dim_stock_group where is_brand = true order by name limit 50;
+```
+
+### Notes
+- Brand is computed for items via hierarchy traversal and now also flagged on groups for fast filters.
+- Some items may lack HSN/UOM; loader preserves existing non-null values on re-runs.
 # Changes Summary - Backfill Implementation
 
 ## What Changed
