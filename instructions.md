@@ -1,253 +1,230 @@
 
-You are extending an existing Python + Postgres ETL that already syncs invoice-level customers from Tally over HTTP. 
-Implement a minimal, SAFE Phase-1 stock-master using the *same codebase*, with **no breaking changes** to existing flows.
+You’re extending an existing Python + Postgres ETL that ALREADY fetches vouchers via Voucher Register and parses item-level details from each voucher (InventoryEntries). DO NOT introduce a new TDL or a different report. Reuse the current HTTP request & parsing logic that exists in the repo.
 
-# Scope (Phase-1 only)
-- Parse Tally’s **Masters export XML** (the same file produced by: Master → Stock Groups → Include dependent masters = Yes). 
-- Ingest **Stock Groups** as the authoritative hierarchy; treat **root group** as “brand”.
-- If the XML also contains **Stock Items**, ingest basic item fields (name, parent, units, HSN) to a dim table. If items are NOT present, just load groups now; we’ll add items via “List of Stock Items”/HTTP later.
-- Load **Units** (dependent masters) for UOM mapping when present.
-- Provide **two input modes**:
-  1) `--from-file Master.xml` (use the uploaded XML)
-  2) `--from-tally "<Company Name>"` (perform the HTTP Export call with built-in reports; still no TDL).
-- Ship with **dry-run**, **preview**, and **validation SQL** so the user (me) can check & approve before we switch it on.
+## Goal
+Persist the item lines you already parse from Voucher Register into a new table `fact_invoice_line`, so we can answer “who bought which SKU” with (invoice_id, customer, item/SKU, qty, uom, rate, pre_tax, tax, total, date).
 
-# Reuse
-- Reuse existing DB adapter patterns (e.g., adapter.py) for connections/transactions/logs.
-- Reuse CLI structure in run.py (add a new subcommand rather than editing current invoice commands).
+## Constraints
+- Keep the existing headers flow (fact_invoice) as-is.
+- Use the same date-range CLI and company settings you already support in `run.py`.
+- Reuse DB helpers in `adapter.py`.
+- If you already have any staging tables, use them; otherwise create light stg tables below.
+- Avoid schema changes to existing tables unless adding safe indexes.
 
-# Files to add
-1) sql/0002_stock_master_from_xml.sql
-2) etl/stock_master_from_xml.py
-3) Update run.py to register a `stockmaster` subcommand.
-4) If needed, add lxml & requests to requirements.
+## Files to ADD
+1) `sql/0003_fact_invoice_line.sql`
+2) `etl/sales_lines_from_vreg.py`
+3) Update `run.py` to add a subcommand: `sales-lines-from-vreg`
 
-# 1) sql/0002_stock_master_from_xml.sql
-Create idempotent objects. Do not break existing facts. Use separate dim tables for clarity.
+### 1) sql/0003_fact_invoice_line.sql
+Idempotent migration only.
 
 ```sql
--- Stock group hierarchy (authoritative)
-create table if not exists dim_stock_group (
-  stock_group_id bigserial primary key,
-  guid           text unique,
-  name           text not null unique,
-  parent_name    text,
-  alter_id       bigint,
-  updated_at     timestamptz default now()
+-- Fact lines table (create if missing)
+create table if not exists fact_invoice_line (
+  invoice_line_id bigserial primary key,
+  invoice_id      bigint not null references fact_invoice(invoice_id) on delete cascade,
+  sku_id          bigint,              -- nullable: resolve by dim_sku if available
+  sku_name        text,                -- denormalized item name as seen on voucher
+  qty             numeric(14,3),
+  uom             text,
+  rate            numeric(14,2),
+  discount        numeric(14,2),
+  line_basic      numeric(14,2),       -- pre-tax (as emitted by InventoryEntries.Amount)
+  line_tax        numeric(14,2),       -- allocated or direct if provided
+  line_total      numeric(14,2),       -- basic + tax
+  created_at      timestamptz default now()
 );
 
-create index if not exists idx_dim_stock_group_parent on dim_stock_group(parent_name);
+create index if not exists idx_fil_invoice on fact_invoice_line (invoice_id);
+create index if not exists idx_fil_sku on fact_invoice_line (sku_id);
 
--- Optional: units catalog from dependent masters (if present)
-create table if not exists dim_uom (
-  uom_name       text primary key,
-  original_name  text,
-  gst_rep_uom    text,
-  is_simple      boolean,
-  alter_id       bigint,
-  updated_at     timestamptz default now()
+-- Lightweight staging (only if you don’t already stage lines)
+create table if not exists stg_vreg_header (
+  guid text,
+  vch_no text,
+  vch_date date,
+  party text,
+  basic_amount numeric(14,2),
+  tax_amount numeric(14,2),
+  total_amount numeric(14,2)
 );
 
--- Basic SKU table for Phase-1 (only if you don’t already have a dim_item/dim_sku)
--- If you already have one, adapt the UPSERTs in the Python file to write there.
-create table if not exists dim_sku (
-  sku_id     bigserial primary key,
-  guid       text unique,
-  sku_name   text not null,
-  parent_name text,
-  uom        text,
-  hsn        text,
-  brand_name text,         -- computed = root stock group
-  updated_at timestamptz default now(),
-  unique (sku_name, parent_name)
+create table if not exists stg_vreg_line (
+  voucher_guid text,
+  stock_item_name text,
+  billed_qty text,        -- e.g., "2 Nos"
+  rate text,              -- e.g., "35000 / Nos"
+  amount numeric(14,2),   -- line basic (pre-tax), as in your current parse
+  discount numeric(14,2)  -- if present in your current parse; else null
 );
-
-create index if not exists idx_dim_sku_brand on dim_sku(brand_name);
 ````
 
-# 2) etl/stock_master_from_xml.py
+### 2) etl/sales_lines_from_vreg.py
 
-Requirements: lxml, requests (for live export), and your existing adapter for DB.
+Implement a module that:
 
-## Behavior
+* Imports/uses the **same** Voucher Register fetcher you already have (e.g., a function/class you call today).
+* Hooks into the parsed object where you currently read: voucher.GUID, voucher.Date, voucher.VoucherNumber, voucher.PartyLedgerName, voucher.InventoryEntries (each with StockItemName, BilledQty, Rate, Amount, Discount if any), and voucher GST ledger totals (CGST/SGST/IGST) that your code already aggregates for header amounts.
+* Supports:
 
-* CLI:
+  * `--lookback-days N` or `--from YYYY-MM-DD --to YYYY-MM-DD` (mirror your existing CLI)
+  * `--dry-run`
+  * `--preview N`
+* Flow:
 
-  * `python -m etl.stock_master_from_xml stockmaster --from-file Master.xml --dry-run --preview 50`
-  * `python -m etl.stock_master_from_xml stockmaster --from-tally "Ashirvad Sales (23-24/24-25)" --preview 100`
-  * Common flags: `--export-csv out.csv`
-* Steps:
+  1. **Run migration** `0003_fact_invoice_line.sql` if not yet applied.
+  2. **Fetch vouchers** using the SAME function you use now (do not change request XML).
+  3. **Stage** rows: truncate `stg_vreg_header` + `stg_vreg_line`, insert headers & lines parsed from your existing structures.
+  4. **Upsert headers** into `fact_invoice` the same way you already do (or skip if you’re already doing it earlier in the pipeline).
+  5. **Delete + insert lines per voucher**:
 
-  1. Ensure schema `sql/0002_stock_master_from_xml.sql`.
-  2. Obtain XML:
+     * Find `invoice_id` by joining staged headers to `fact_invoice` on `(vch_no, vch_date)` or GUID (whichever your system uses).
+     * Delete existing `fact_invoice_line` for those `invoice_id`s.
+     * Insert line rows with:
 
-     * If `--from-file`, read local file.
-     * If `--from-tally`, POST the “All Masters” (or “List of Stock Groups”) built-in export:
+       * `sku_id` resolved by `dim_sku`:
 
-       * ReportName: `All Masters` OR `List of Stock Groups` (XML), with `<SVCURRENTCOMPANY>`.
-  3. Parse:
+         * Preferred: by `guid` if your schema keeps it on dim_sku and your parser captures it.
+         * Else fallback: `lower(dim_sku.sku_name) = lower(stock_item_name)`.
+       * `qty` = numeric from `billed_qty` (regex on the numeric part).
+       * `uom` = unit token from `billed_qty` OR from `rate` (after slash) when present.
+       * `rate` = numeric part of `rate` before `/`.
+       * `line_basic` = staged `amount`.
+       * `line_tax` = proportional allocation from voucher tax, unless you already parse line tax (if you do, use your value).
+       * `line_total` = `line_basic + line_tax`.
+  6. **Preview**: print top N rows “who bought which SKU”.
 
-     * **Units**: `<UNIT>` → NAME, ORIGINALNAME, GSTREPUOM, ISSIMPLEUNIT, ALTERID.
-     * **Stock Groups**: `<STOCKGROUP>` → NAME, PARENT (empty/null for root), GUID, ALTERID.
-     * **Stock Items** (if present): `<STOCKITEM>` → NAME, PARENT (immediate group), BASEUNITS, HSNCODE/HSNDETAILS (when present), GUID.
-  4. Dry-run mode builds in-memory rows and prints counts + sample preview; real mode UPSERTs:
+Parsing helpers (keep tiny):
 
-     * `dim_stock_group`: upsert by GUID (fallback name).
-     * `dim_uom`: upsert by uom_name.
-     * `dim_sku`: if items parsed, upsert by GUID (fallback sku_name + parent_name). Keep non-null existing values unless replaced with non-empty new values.
-  5. Compute **brand_name** for every SKU by walking `dim_stock_group` upwards from `parent_name` until root.
-  6. Preview: sample table (brand_name, sku_name, uom, hsn). Optionally CSV.
+* `parse_qty_uom("2.00 Nos") -> (2.00, "Nos")`
+* `parse_rate("35000 / Nos") -> 35000`
+* If your current code already does these, REUSE those helpers instead of reimplementing.
 
-## UPSERT SQL (write exactly; use adapter’s parameterization)
+**SQL used by this module (parameterized via adapter):**
 
--- Groups (GUID-first, fallback name)
+Headers → (only if you need to upsert here; otherwise rely on your existing header loader)
 
 ```sql
-insert into dim_stock_group (guid, name, parent_name, alter_id, updated_at)
-values ($1,$2,$3,$4, now())
-on conflict (guid) do update
-  set name=excluded.name, parent_name=excluded.parent_name,
-      alter_id=excluded.alter_id, updated_at=now();
-
-insert into dim_stock_group (name, parent_name, alter_id, updated_at)
-values ($1,$2,$3, now())
-on conflict (name) do update
-  set parent_name=excluded.parent_name, alter_id=excluded.alter_id, updated_at=now();
+insert into fact_invoice (vch_no, date, vchtype, customer_id, basic_amount, tax_amount, total)
+select vch_no, vch_date, 'Invoice',
+       coalesce(dc.customer_id, 0)::bigint,
+       basic_amount, tax_amount, total_amount
+from stg_vreg_header h
+left join dim_customer dc on lower(dc.name) = lower(h.party)
+on conflict (vch_no, date) do update
+  set basic_amount = excluded.basic_amount,
+      tax_amount   = excluded.tax_amount,
+      total        = excluded.total;
 ```
 
--- Units
+Delete & reinsert lines:
 
 ```sql
-insert into dim_uom (uom_name, original_name, gst_rep_uom, is_simple, alter_id, updated_at)
-values ($1,$2,$3,$4,$5, now())
-on conflict (uom_name) do update
-  set original_name=excluded.original_name,
-      gst_rep_uom=excluded.gst_rep_uom,
-      is_simple=excluded.is_simple,
-      alter_id=excluded.alter_id,
-      updated_at=now();
-```
-
--- SKUs (only if <STOCKITEM> exists in the XML)
-
-```sql
-insert into dim_sku (guid, sku_name, parent_name, uom, hsn, updated_at)
-values ($1,$2,$3,$4,$5, now())
-on conflict (guid) do update
-  set sku_name=excluded.sku_name,
-      parent_name=excluded.parent_name,
-      uom = coalesce(nullif(excluded.uom,''), dim_sku.uom),
-      hsn = coalesce(nullif(excluded.hsn,''), dim_sku.hsn),
-      updated_at=now();
-
-insert into dim_sku (sku_name, parent_name, uom, hsn, updated_at)
-values ($1,$2,$3,$4, now())
-on conflict (sku_name, parent_name) do update
-  set uom = coalesce(nullif(excluded.uom,''), dim_sku.uom),
-      hsn = coalesce(nullif(excluded.hsn,''), dim_sku.hsn),
-      updated_at=now();
-```
-
--- Compute brand = root group (works even with variable depths)
-
-```sql
-with recursive grp as (
-  select s.sku_id, g.name as group_name, g.parent_name, 1 as depth
-  from dim_sku s
-  left join dim_stock_group g on g.name = s.parent_name
-  union all
-  select grp.sku_id, g2.name, g2.parent_name, grp.depth + 1
-  from grp
-  join dim_stock_group g2 on g2.name = grp.parent_name
+with inv as (
+  select fi.invoice_id, fi.vch_no, fi.date
+  from fact_invoice fi
+  join stg_vreg_header h on h.vch_no = fi.vch_no and h.vch_date = fi.date
 ),
-root as (
-  select sku_id,
-         (array_agg(group_name order by case when parent_name is null then 0 else 1 end, depth asc))[1] as root_group
-  from grp
-  group by sku_id
+line_src as (
+  select
+    i.invoice_id,
+    l.stock_item_name,
+    l.billed_qty,
+    l.rate,
+    l.amount as line_basic
+  from stg_vreg_line l
+  join stg_vreg_header h on h.guid = l.voucher_guid
+  join inv i on i.vch_no = h.vch_no and i.date = h.vch_date
+),
+sum_basic as (
+  select invoice_id, sum(line_basic) as sum_line_basic
+  from line_src group by 1
+),
+tax_alloc as (
+  select i.invoice_id, h.tax_amount as voucher_tax
+  from stg_vreg_header h
+  join inv i on i.vch_no = h.vch_no and i.date = h.vch_date
 )
-update dim_sku s
-set brand_name = coalesce(r.root_group, s.parent_name)
-from root r
-where r.sku_id = s.sku_id
-  and coalesce(s.brand_name,'') <> coalesce(r.root_group, s.parent_name,'');
+delete from fact_invoice_line fil
+using inv
+where fil.invoice_id = inv.invoice_id;
+
+insert into fact_invoice_line (
+  invoice_id, sku_id, sku_name, qty, uom, rate, discount, line_basic, line_tax, line_total
+)
+select
+  ls.invoice_id,
+  ds.sku_id,
+  ls.stock_item_name,
+  (regexp_matches(coalesce(ls.billed_qty,''), '([0-9.+-]+)[[:space:]]*([^/]*)'))[1]::numeric as qty,
+  nullif((regexp_matches(coalesce(ls.billed_qty,''), '([0-9.+-]+)[[:space:]]*([^/]*)'))[2], '') as uom,
+  nullif(regexp_replace(coalesce(ls.rate,''), '[/].*$', ''), '')::numeric as rate,
+  null::numeric as discount,  -- set from your parser if available
+  ls.line_basic,
+  round(coalesce((ls.line_basic / nullif(sb.sum_line_basic,0)) * coalesce(ta.voucher_tax,0),0),2) as line_tax,
+  round(ls.line_basic + coalesce((ls.line_basic / nullif(sb.sum_line_basic,0)) * coalesce(ta.voucher_tax,0),0),2) as line_total
+from line_src ls
+left join sum_basic sb on sb.invoice_id = ls.invoice_id
+left join tax_alloc ta on ta.invoice_id = ls.invoice_id
+left join dim_sku ds on lower(ds.sku_name) = lower(ls.stock_item_name);
 ```
 
-## Parser notes
-
-* Map empty tags to NULL; `.text.strip()` where applicable.
-* For **HSN**: prefer the latest `<HSNDETAILS.LIST>` with `<HSNCODE>` if multiple appear; else take first non-empty.
-* For **UOM**: take `<BASEUNITS>` on item; if empty, try to map from `dim_uom` if name matches.
-* GUID may be absent on some groups/items; the fallback uniqueness is `name` (groups) and `(sku_name, parent_name)` (items).
-
-## Preview (interim check)
-
-* When dry-run or after real run, show:
-
-  * Counts: groups parsed, units parsed, items parsed; upserts (inserted/updated) if not dry-run.
-  * If items present: a table of `brand_name, sku_name, uom, hsn` limited by `--preview N`.
-  * If items NOT present: show **group tree** sample: root groups and a few children to verify hierarchy.
-
-SQL helpers for me to review:
+**Preview query (print in the tool when `--preview` is set):**
 
 ```sql
--- 1) Totals
-select (select count(*) from dim_stock_group) as groups,
-       (select count(*) from dim_uom) as uoms,
-       (select count(*) from dim_sku) as skus,
-       (select count(distinct brand_name) from dim_sku where brand_name is not null) as brands;
-
--- 2) Sample of SKUs (if present)
-select brand_name, sku_name, uom, hsn
-from dim_sku
-order by brand_name nulls last, sku_name
-limit 50;
-
--- 3) If no SKUs in XML, show a peek of group roots & children
-select g.name as root, c.name as child
-from dim_stock_group g
-left join dim_stock_group c on c.parent_name = g.name
-where g.parent_name is null
-order by g.name, c.name
-limit 50;
+select
+  fi.date, fi.vch_no,
+  dc.name as customer,
+  fil.sku_name, fil.qty, fil.uom, fil.rate,
+  fil.line_basic, fil.line_tax, fil.line_total
+from fact_invoice fi
+join fact_invoice_line fil on fil.invoice_id = fi.invoice_id
+left join dim_customer dc on dc.customer_id = fi.customer_id
+order by fi.date desc, fi.vch_no
+limit %s;
 ```
 
-# 3) run.py integration
+### 3) run.py
 
-* Add a subcommand:
+Add a subcommand **without** modifying existing ones:
 
-  * `python run.py stockmaster --from-file Master.xml --dry-run --preview 50`
-  * `python run.py stockmaster --from-tally "Ashirvad Sales (23-24/24-25)" --preview 100`
-* Delegate to `etl/stock_master_from_xml.py`.
+* `python run.py sales-lines-from-vreg --lookback-days 7 --dry-run --preview 25`
+* `python run.py sales-lines-from-vreg --from 2025-04-01 --to 2025-10-15 --preview 50`
 
-# 4) Requirements
+Behavior:
 
-* Ensure these exist (add if missing):
+* Uses the same company/date-range options you already support for Voucher Register.
+* If `--dry-run`: do fetch+parse+stage in memory and show the preview; skip DB writes.
 
-  * lxml
-  * requests
+## Validation & interim checks (print at end)
 
-# Implementation constraints
+* Headers seen / staged; Lines staged; Invoices affected.
+* Inserted/Updated header counts (if you upserted here).
+* Lines inserted.
+* `unmatched_skus_by_name` (count & sample of item names not found in dim_sku).
+* `unmatched_customers` (if any).
+* Reminder that we can switch to GUID-based SKU resolution later (if your current parse doesn’t carry item GUID).
 
-* Keep functions small: `load_xml_file()`, `fetch_export_http(company)`, `parse_units()`, `parse_groups()`, `parse_items_if_any()`, `upsert_groups()`, `upsert_units()`, `upsert_items()`, `compute_brands()`, `preview()`.
-* Clean logs, clear exceptions for malformed XML.
-* No changes to existing invoice ingestion.
-* Idempotent migrations and upserts.
+## Notes
 
-# Final developer checklist (print at end of run)
+* Many Voucher Register exports emit `InventoryEntries.Amount` as **pre-tax**; your header tax is from GST ledgers. The proportional allocation above is the safest default. If your parser already extracts **line-level GST**, prefer those values and skip allocation.
+* Returns/Credit Notes: if your Voucher Register includes them, add a `where vch_type = 'Sales'` filter in your existing fetch or exclude negatives when inserting lines (leave as you already do for headers).
+* Performance: for large windows, chunk by 7 days; your existing runner likely already does this—reuse it.
 
-* Show whether SKUs were found in the XML. If not, suggest running the live “List of Stock Items” export later.
-* Show distinct count of root groups (brands).
-* If any item parent group is missing in dim_stock_group, log the item and skip brand computation for that row.
+Build all of the above now. Keep code small, plug into existing fetch/parsing path, and DO NOT change the request envelope or header ingestion that already works.
 
 ```
 
 ---
 
-### How we’ll validate together
-1) Run: `python run.py stockmaster --from-file Master.xml --dry-run --preview 50`  
-   Paste me the first ~10 rows of the preview (or the root/child group peek if no SKUs present).
-2) If structure looks right, run without `--dry-run`, then share:
-   - totals, distinct brand count, and a couple of known SKUs/brands for spot checks.
-3) If any brand looks off, we’ll tweak the “brand = root” logic (e.g., pin a specific ancestor level for certain families).
+Run it like this to test without writing:
+
+```
+
+python run.py sales-lines-from-vreg --lookback-days 7 --dry-run --preview 20
+
+```
+
+Then run it “for real” (drop `--dry-run`) and share the preview/summary if you want me to sanity-check the results.
 ```

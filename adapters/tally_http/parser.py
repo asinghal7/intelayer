@@ -101,11 +101,34 @@ def _inventory_total_amount(voucher: etree._Element) -> float:
         total += amt
     return total
 
+def _parse_inventory_entries(voucher: etree._Element) -> list[dict]:
+    """
+    Parse individual inventory entries from a voucher.
+    Returns list of dicts with: stock_item_name, billed_qty, rate, amount, discount
+    """
+    entries = []
+    for inv_entry in voucher.findall(".//ALLINVENTORYENTRIES.LIST"):
+        stock_item_name = (inv_entry.findtext("STOCKITEMNAME") or "").strip()
+        billed_qty = (inv_entry.findtext("BILLEDQTY") or "").strip()
+        rate = (inv_entry.findtext("RATE") or "").strip()
+        amount = _to_float(inv_entry.findtext("AMOUNT"))
+        discount = _to_float(inv_entry.findtext("DISCOUNT"))
+        
+        if stock_item_name:  # Only include entries with item names
+            entries.append({
+                "stock_item_name": stock_item_name,
+                "billed_qty": billed_qty,
+                "rate": rate,
+                "amount": amount,
+                "discount": discount
+            })
+    return entries
+
 def parse_daybook(xml_text: str) -> list[dict]:
     """
     Return vouchers with amounts separated into subtotal (pre-tax) and total (post-tax).
     Fields: vchtype, vchnumber, date, party, amount (for backward compat), subtotal, total, guid, 
-            party_gstin, party_pincode, party_city
+            party_gstin, party_pincode, party_city, inventory_entries
     """
     # Sanitize XML to remove invalid characters
     sanitized = sanitize_xml(xml_text)
@@ -172,6 +195,9 @@ def parse_daybook(xml_text: str) -> list[dict]:
             subtotal = amt
             total = amt
 
+        # Parse inventory entries for line items
+        inventory_entries = _parse_inventory_entries(v)
+
         out.append({
             "vchtype": vchtype,
             "vchnumber": vchnumber,
@@ -184,5 +210,6 @@ def parse_daybook(xml_text: str) -> list[dict]:
             "party_gstin": party_gstin if party_gstin else None,
             "party_pincode": party_pincode if party_pincode else None,
             "party_city": party_city if party_city else None,
+            "inventory_entries": inventory_entries,
         })
     return out

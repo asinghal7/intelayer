@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+import sys
 import psycopg
 from loguru import logger
 from pathlib import Path
@@ -121,5 +122,10 @@ def main():
             raise
 
 if __name__ == "__main__":
-    main()
+    # Lightweight subcommand shim to avoid disrupting existing behavior
+    if len(sys.argv) > 1 and sys.argv[1] == "sales-lines-from-vreg":
+        from agent.sales_lines_from_vreg import main as sales_lines_main
+        sales_lines_main(sys.argv[2:])
+    else:
+        main()
 
