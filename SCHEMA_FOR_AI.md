@@ -27,11 +27,13 @@ The database has 16 tables organized into 4 categories:
 - gstin (text, optional) - Goods and Services Tax Identification Number
 - city (text, optional) - Customer's city
 - pincode (text, optional) - Postal code
+- ledger_group_name (text, optional) - Ledger group this customer belongs to
 - created_at (timestamp) - When this record was created
 
 **Key Relationships**:
 - Referenced by: fact_invoice.customer_id, fact_receipt.customer_id
 - References: dim_pincode.pincode (indirectly via pincode field)
+- References: dim_ledger_group.name (via ledger_group_name field)
 
 **Example Data**:
 ```
@@ -40,6 +42,7 @@ name: "ABC Corporation"
 gstin: "27AAECA1234M1Z5"
 city: "Mumbai"
 pincode: "400001"
+ledger_group_name: "North Zone Debtors"
 ```
 
 ---
@@ -100,6 +103,34 @@ Electronics (parent_name: NULL)
   │   ├── Accessories (parent_name: "Mobile Phones")
   │   └── Chargers (parent_name: "Mobile Phones")
   └── Computers (parent_name: "Electronics")
+```
+
+---
+
+### Table: dim_ledger_group
+
+**Purpose**: Defines hierarchical categorization of customers/ledgers (e.g., Sundry Debtors > North Zone Debtors > Delhi Customers).
+
+**Columns**:
+- ledger_group_id (bigserial, primary key) - Auto-incrementing ID
+- guid (text, unique, optional) - Tally ERP system GUID
+- name (text, unique, required) - Ledger group name
+- parent_name (text, optional) - Parent group name for hierarchy
+- alter_id (bigint, optional) - Tally alteration ID
+- updated_at (timestamp) - Last update timestamp
+
+**Key Relationships**:
+- Referenced by: dim_customer.ledger_group_name
+
+**Hierarchy Example**:
+```
+Sundry Debtors (parent_name: NULL)
+  ├── North Zone Debtors (parent_name: "Sundry Debtors")
+  │   ├── Delhi Customers (parent_name: "North Zone Debtors")
+  │   └── Punjab Customers (parent_name: "North Zone Debtors")
+  └── South Zone Debtors (parent_name: "Sundry Debtors")
+      ├── Mumbai Customers (parent_name: "South Zone Debtors")
+      └── Bangalore Customers (parent_name: "South Zone Debtors")
 ```
 
 ---
@@ -391,6 +422,11 @@ error: NULL
    - Many items belong to one stock group
    - Relationship via parent_name field
 
+7. **dim_customer → dim_ledger_group** (Many-to-One)
+   - Many customers belong to one ledger group
+   - Relationship via ledger_group_name field
+   - Enables customer segmentation and reporting
+
 ### Data Flow
 
 ```
@@ -504,9 +540,10 @@ This schema represents the final state after all migrations:
 - 0004_stock_masters.sql - Added stock groups and extended items
 - 0005_brand_flag.sql - Added brand flag
 - 0006_fact_invoice_line.sql - Added line-level details
+- 0007_ledger_masters.sql - Added ledger groups and customer ledger group assignment
 
-Total Tables: 16
-- Dimensions: 6
+Total Tables: 17
+- Dimensions: 7
 - Facts: 3
 - Staging: 2
 - Operational: 2

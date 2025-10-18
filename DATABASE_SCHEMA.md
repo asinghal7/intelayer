@@ -14,6 +14,7 @@ The database has evolved through the following migrations:
 4. **0004_stock_masters.sql** - Extended item table and added stock groups
 5. **0005_brand_flag.sql** - Added brand flag to items
 6. **0006_fact_invoice_line.sql** - Added line-level invoice details
+7. **0007_ledger_masters.sql** - Added ledger group hierarchy and customer ledger group assignment
 
 ---
 
@@ -30,14 +31,21 @@ Customer master data with location information.
 | `gstin` | text | | GST identification number |
 | `city` | text | | Customer city |
 | `pincode` | text | | Postal code |
+| `ledger_group_name` | text | | Ledger group this customer belongs to |
 | `created_at` | timestamptz | DEFAULT now() | Record creation timestamp |
 
 **Indexes:**
 - Primary key on `customer_id`
+- Index on `ledger_group_name`
 
 **Usage:**
 - Links to `fact_invoice.customer_id`
 - Links to `fact_receipt.customer_id`
+- References `dim_ledger_group.name` via `ledger_group_name`
+
+**Notes:**
+- `ledger_group_name` added in migration 0007
+- Enables customer segmentation by ledger groups (e.g., "Sundry Debtors", "North Zone Debtors")
 
 ---
 
@@ -100,6 +108,37 @@ Stock group hierarchy for item categorization.
 **Notes:**
 - Created in migration 0004
 - Supports multi-level hierarchy via `parent_name`
+
+---
+
+### dim_ledger_group
+
+Ledger group hierarchy for customer/ledger categorization.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `ledger_group_id` | bigserial | PRIMARY KEY | Auto-increment ID |
+| `guid` | text | UNIQUE | Tally GUID |
+| `name` | text | UNIQUE NOT NULL | Ledger group name |
+| `parent_name` | text | | Parent group name |
+| `alter_id` | bigint | | Tally alter ID |
+| `updated_at` | timestamptz | DEFAULT now() | Last update timestamp |
+
+**Indexes:**
+- Primary key on `ledger_group_id`
+- Unique index on `guid`
+- Unique index on `name`
+- Index on `parent_name`
+
+**Usage:**
+- Hierarchical categorization of customers/ledgers
+- Enables customer segmentation (e.g., "Sundry Debtors", "North Zone Debtors")
+- Referenced by `dim_customer.ledger_group_name`
+
+**Notes:**
+- Created in migration 0007
+- Supports multi-level hierarchy via `parent_name`
+- Example hierarchy: Sundry Debtors → North Zone Debtors → Delhi Customers
 
 ---
 
@@ -367,13 +406,16 @@ ETL execution logs for monitoring and debugging.
 
 ```
 dim_customer ──┬── fact_invoice
-               └── fact_receipt
+               ├── fact_receipt
+               └── dim_ledger_group (via ledger_group_name)
 
 dim_salesperson ── fact_invoice
 
 dim_item ────────── fact_invoice_line
                          │
                          └── fact_invoice (via invoice_id)
+
+dim_stock_group ─── dim_item (via parent_name)
 ```
 
 ### Key Relationships
@@ -399,6 +441,11 @@ dim_item ────────── fact_invoice_line
 5. **dim_item → dim_stock_group**
    - Many items to one stock group
    - Relationship via `parent_name`
+
+6. **dim_customer → dim_ledger_group**
+   - Many customers to one ledger group
+   - Relationship via `ledger_group_name`
+   - Enables customer segmentation
 
 ---
 
@@ -496,6 +543,12 @@ dim_item ────────── fact_invoice_line
 - Created staging tables (stg_vreg_header, stg_vreg_line)
 - Added indexes for line queries
 
+### 0007_ledger_masters.sql
+- Created dim_ledger_group table for ledger group hierarchy
+- Added ledger_group_name column to dim_customer
+- Added indexes for performance
+- Enables customer segmentation by ledger groups
+
 ---
 
 ## Best Practices
@@ -591,12 +644,28 @@ where fi.date between '2025-09-01' and '2025-09-30'
 order by fi.date desc, fi.voucher_key;
 ```
 
+### Sales by Ledger Group
+```sql
+select 
+  dc.ledger_group_name,
+  count(distinct dc.customer_id) as customer_count,
+  count(distinct fi.invoice_id) as invoice_count,
+  sum(fi.total) as total_sales
+from fact_invoice fi
+join dim_customer dc on dc.customer_id = fi.customer_id
+where fi.date between '2025-09-01' and '2025-09-30'
+  and dc.ledger_group_name is not null
+group by dc.ledger_group_name
+order by total_sales desc;
+```
+
 ---
 
 ## Related Documentation
 
 - `SALES_LINES_USAGE.md` - Sales lines ETL usage guide
 - `STOCK_MASTER_USAGE.md` - Stock masters ETL
+- `LEDGER_MASTER_USAGE.md` - Ledger masters ETL
 - `BACKFILL_GUIDE.md` - Data backfill procedures
 - `SETUP_INSTRUCTIONS.md` - Initial setup guide
 

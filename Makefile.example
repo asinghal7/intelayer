@@ -1,0 +1,67 @@
+# Example Makefile for Intelayer ETL Workflows
+# 
+# Copy this to Makefile and customize for your environment
+
+.PHONY: help sync-masters sync-transactions sync-all test
+
+# Default target
+help:
+	@echo "Intelayer ETL Makefile"
+	@echo ""
+	@echo "Available targets:"
+	@echo "  sync-masters      - Sync master data (stock and ledger groups) - run weekly"
+	@echo "  sync-transactions - Sync transaction data (invoices, receipts) - run daily"
+	@echo "  sync-all          - Run both masters and transactions"
+	@echo "  test              - Run tests"
+	@echo ""
+	@echo "Usage:"
+	@echo "  make sync-masters      # Weekly master data sync"
+	@echo "  make sync-transactions # Daily transaction sync"
+	@echo "  make sync-all          # Run everything"
+
+# Sync master data (run weekly or monthly)
+# This includes stock masters and ledger masters
+sync-masters:
+	@echo "=== Syncing Master Data ==="
+	@echo "Fetching stock masters from Tally..."
+	python -m agent.stock_masters --from-tally
+	@echo ""
+	@echo "Fetching ledger masters from Tally..."
+	python -m agent.ledger_masters --from-tally
+	@echo ""
+	@echo "✓ Master data sync complete"
+
+# Sync transaction data (run daily)
+# This includes invoices and receipts
+sync-transactions:
+	@echo "=== Syncing Transaction Data ==="
+	@echo "Fetching daybook data from Tally..."
+	python -m agent.run
+	@echo ""
+	@echo "✓ Transaction sync complete"
+
+# Sync everything (masters + transactions)
+sync-all: sync-masters sync-transactions
+	@echo ""
+	@echo "✓ All data sync complete"
+
+# Run tests
+test:
+	python -m pytest tests/
+
+# Optional: Add a target to backfill historical data
+# Usage: make backfill START_DATE=2024-04-01 END_DATE=2024-10-31
+backfill:
+	@if [ -z "$(START_DATE)" ] || [ -z "$(END_DATE)" ]; then \
+		echo "Usage: make backfill START_DATE=YYYY-MM-DD END_DATE=YYYY-MM-DD"; \
+		exit 1; \
+	fi
+	python -m agent.backfill $(START_DATE) $(END_DATE)
+
+# Optional: Add a target to sync sales lines
+sync-sales-lines:
+	@echo "=== Syncing Sales Lines ==="
+	python -m agent.run sales-lines-from-vreg
+	@echo ""
+	@echo "✓ Sales lines sync complete"
+

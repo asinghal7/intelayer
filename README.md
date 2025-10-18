@@ -10,9 +10,10 @@ Intelligent analytics layer for MSME ERPs — **Tally-first**. Extract via **HTT
    `psql $DB_URL -f warehouse/ddl/0001_cdm.sql`
 4) Install deps into your existing venv:  
    `pip install -e .`
-5) Run ETL once: `python agent/run.py`
-6) **[Optional]** Load historical data: `python -m agent.backfill 2024-04-01 2024-10-13` (see `BACKFILL_QUICKSTART.md`)
-7) Open Metabase: http://localhost:3000 (connect to Postgres).
+5) **[Optional]** Load master data: `python -m agent.stock_masters --from-tally` and `python -m agent.ledger_masters --from-tally`
+6) Run ETL once: `python agent/run.py`
+7) **[Optional]** Load historical data: `python -m agent.backfill 2024-04-01 2024-10-13` (see `BACKFILL_QUICKSTART.md`)
+8) Open Metabase: http://localhost:3000 (connect to Postgres).
 
 ## Structure
 - `adapters/` — adapter SDK + Tally HTTP adapter
@@ -60,3 +61,6 @@ python -m agent.backfill 2024-04-01 2024-10-13 --dry-run
 - `BACKFILL_QUICKSTART.md` - Quick reference with common commands
 - `BACKFILL_GUIDE.md` - Comprehensive guide with workflows and troubleshooting
 - `BACKFILL_IMPLEMENTATION_SUMMARY.md` - Technical details and architecture
+- `STOCK_MASTER_USAGE.md` - Stock masters ETL guide
+- `LEDGER_MASTER_USAGE.md` - Ledger masters ETL guide (customer segmentation)
+- `DATABASE_SCHEMA.md` - Complete database schema documentation
