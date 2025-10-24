@@ -30,19 +30,22 @@ def _to_float(x: str | None) -> float:
 def _party_line_amount_signed(voucher: etree._Element, party_name: str, vchtype: str = None) -> float | None:
     """
     Extract party ledger amount with voucher-type aware tag selection.
-    - For Invoice vouchers: Check LEDGERENTRIES.LIST (single R)
-    - For other vouchers: Check ALLLEDGERENTRIES.LIST (double L)
+    - For Sales/Invoice/Credit Note/Purchase/Debit Note: Check LEDGERENTRIES.LIST (single R)
+    - For Receipt/Payment/Journal: Check ALLLEDGERENTRIES.LIST (double L)
     """
     party = (party_name or "").strip().lower()
     
-    # For Invoice vouchers, check LEDGERENTRIES.LIST (single R)
-    if vchtype == "Invoice":
+    # Voucher types that use LEDGERENTRIES.LIST (single R)
+    ledger_entries_types = {"Invoice", "Sales", "Credit Note", "Sales Return", "Purchase", "Purchase Return", "Debit Note"}
+    
+    # For Sales/Invoice/Credit Note/Purchase/Debit Note, check LEDGERENTRIES.LIST (single R)
+    if vchtype in ledger_entries_types:
         for le in voucher.findall(".//LEDGERENTRIES.LIST"):
             lname = (le.findtext("LEDGERNAME") or "").strip().lower()
             if lname == party or party[:15] in lname[:15]:
                 return _to_float(le.findtext("AMOUNT"))  # keep sign
     
-    # For all other voucher types, check ALLLEDGERENTRIES.LIST (double L)
+    # For Receipt/Payment/Journal, check ALLLEDGERENTRIES.LIST (double L)
     for le in voucher.findall(".//ALLLEDGERENTRIES.LIST"):
         lname = (le.findtext("LEDGERNAME") or "").strip().lower()
         if lname == party or party[:15] in lname[:15]:
@@ -53,21 +56,24 @@ def _party_line_amount_signed(voucher: etree._Element, party_name: str, vchtype:
 def _fallback_amount_signed(voucher: etree._Element, vchtype: str = None) -> float:
     """
     Choose the line with largest magnitude; keep its original sign.
-    - For Invoice vouchers: Check LEDGERENTRIES.LIST (single R)
-    - For other vouchers: Check ALLLEDGERENTRIES.LIST (double L)
+    - For Sales/Invoice/Credit Note/Purchase/Debit Note: Check LEDGERENTRIES.LIST (single R)
+    - For Receipt/Payment/Journal: Check ALLLEDGERENTRIES.LIST (double L)
     """
     best_val = 0.0
     best_abs = 0.0
     
-    # For Invoice vouchers, check LEDGERENTRIES.LIST (single R)
-    if vchtype == "Invoice":
+    # Voucher types that use LEDGERENTRIES.LIST (single R)
+    ledger_entries_types = {"Invoice", "Sales", "Credit Note", "Sales Return", "Purchase", "Purchase Return", "Debit Note"}
+    
+    # For Sales/Invoice/Credit Note/Purchase/Debit Note, check LEDGERENTRIES.LIST (single R)
+    if vchtype in ledger_entries_types:
         for le in voucher.findall(".//LEDGERENTRIES.LIST"):
             v = _to_float(le.findtext("AMOUNT"))
             if abs(v) > best_abs:
                 best_abs = abs(v)
                 best_val = v
     
-    # For all other voucher types, check ALLLEDGERENTRIES.LIST (double L)
+    # For Receipt/Payment/Journal, check ALLLEDGERENTRIES.LIST (double L)
     for le in voucher.findall(".//ALLLEDGERENTRIES.LIST"):
         v = _to_float(le.findtext("AMOUNT"))
         if abs(v) > best_abs:
@@ -85,8 +91,8 @@ def _bill_allocation_amount(voucher: etree._Element) -> float | None:
     for bill_alloc in voucher.findall(".//BILLALLOCATIONS.LIST"):
         amt_text = bill_alloc.findtext("AMOUNT")
         if amt_text:
-            # Return absolute value (bill allocations are typically negative)
-            return abs(_to_float(amt_text))
+            # Return natural sign (don't force positive)
+            return _to_float(amt_text)
     return None
 
 def _inventory_total_amount(voucher: etree._Element) -> float:
@@ -172,14 +178,16 @@ def parse_daybook(xml_text: str) -> list[dict]:
         amt_from_bill = _bill_allocation_amount(v)
         
         # Determine subtotal and total based on what's available
+        # Keep natural signs initially - adapter will handle sign normalization
         if amt_from_inventory and (amt_from_ledger or amt_from_bill):
             # Invoice with both pre-tax and post-tax amounts
             subtotal = amt_from_inventory  # Pre-tax from inventory
             # Prefer ledger amount (more universal), fallback to bill allocation
-            total = abs(amt_from_ledger) if amt_from_ledger else amt_from_bill
+            # Keep natural sign - don't force positive
+            total = amt_from_ledger if amt_from_ledger else amt_from_bill
         elif amt_from_ledger:
             # Has ledger amount but no inventory - use ledger for both
-            total = abs(amt_from_ledger)
+            total = amt_from_ledger
             subtotal = total  # No separate tax information
         elif amt_from_bill:
             # Has bill allocation but no inventory

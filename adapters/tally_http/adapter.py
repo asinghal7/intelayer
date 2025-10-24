@@ -64,11 +64,45 @@ class TallyHTTPAdapter:
             if self.include_types and d["vchtype"] not in self.include_types:
                 continue
             
-            # Extract subtotal (pre-tax) and total (post-tax)
+            # Extract subtotal (pre-tax) and total (post-tax) with natural signs from Tally
             subtotal = float(d.get("subtotal") or 0.0)
             total = float(d.get("total") or 0.0)
             
-            # Calculate tax as difference between total and subtotal
+            # Normalize signs based on voucher type to ensure subtotal and total have same sign
+            # This accounts for Tally's accounting conventions where party ledger amounts
+            # have different signs for different voucher types
+            
+            if d["vchtype"] in ("Invoice", "Sales", "Debit Note"):
+                # For sales-type vouchers:
+                # - Inventory (subtotal) is positive in Tally
+                # - Party ledger (total) is negative in Tally
+                # → Negate total to make it positive (revenue/income)
+                if subtotal < 0:
+                    subtotal = -subtotal
+                if total < 0:
+                    total = -total
+                    
+            elif d["vchtype"] in ("Purchase", "Purchase Return"):
+                # For purchase-type vouchers:
+                # - Inventory (subtotal) is negative in Tally
+                # - Party ledger (total) is positive in Tally
+                # → Negate total to make it negative (expense)
+                if subtotal > 0:
+                    subtotal = -subtotal
+                if total > 0:
+                    total = -total
+                    
+            elif d["vchtype"] in ("Credit Note", "Sales Return"):
+                # For credit notes:
+                # - Both subtotal and total are naturally negative in Tally
+                # → Ensure both are negative (returns/refunds)
+                if subtotal > 0:
+                    subtotal = -subtotal
+                if total > 0:
+                    total = -total
+            
+            # Calculate tax AFTER sign normalization
+            # Now both subtotal and total have consistent signs
             tax = total - subtotal
             
             # Create invoice with embedded customer details
