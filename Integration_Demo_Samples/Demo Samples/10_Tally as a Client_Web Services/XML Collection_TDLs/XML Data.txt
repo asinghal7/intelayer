@@ -1,0 +1,111 @@
+;; Sri Ganeshji : Sri Balaji : Sri Pitreshwarji : Sri Durgaji : Sri Venkateshwara
+
+/*
+
+XML Data :
+
+XML file format present on Remote URL on Tally Screen 
+
+*/
+
+[Part : XML Data]
+
+	Lines 		: XML Data, XML Data 1, XML Data 2, XML Data3, XML Data 4, XML Data 5
+	Lines 		: XML Data6, XML Data 7, XML Data8, XML Data9, XML Data10, XML Data11
+	Lines 		: XML Data 12, XML Data 13, XML Data14
+	Border 		: Thin Cover
+	Space Left 	: 10
+
+	[Line: XML Data]
+
+		Fields	: XML Data
+		Local	: Field	: XML Data	: Style 	: Normal Bold
+
+		[Field: XML Data]
+
+			Set As 	: "XML Data Available on Remote Server"
+
+	[Line: XML Data1]
+
+		SpaceTop: 1
+		Fields 	: XML Data
+		Local	: Field		: XML Data	: Set as	: "<CUSTOMER>"
+
+	[Line: XML Data2]
+
+		Fields 	: XML Data
+		Local	: Field		: XML Data	: Set as	: "<NAME>Sapna Awasthi</NAME>"
+		Local	: Field		: XML Data	: Indent	: 5
+
+	[Line: XML Data3]
+
+		Fields 	: XML Data
+		Local	: Field		: XML Data	: Set as	: "<EMPID>1000</EMPID>"
+		Local	: Field		: XML Data	: Indent	: 5
+
+	[Line: XML Data4]
+
+		Fields 	: XML Data
+		Local	: Field		: XML Data	: Set as	: "- <PHONE>"
+		Local	: Field		: XML Data	: Indent	: 5
+
+	[Line: XML Data5]
+
+		Fields 	: XML Data
+		Local	: Field		: XML Data	: Set as	: "<OFFICENO>080-66282559</OFFICENO>"
+		Local	: Field		: XML Data	: Indent	: 10
+
+	[Line: XML Data6]
+
+		Fields 	: XML Data
+		Local	: Field		: XML Data	: Set as	: "<HOMENO>011-22222222</HOMENO>"
+		Local	: Field		: XML Data	: Indent	: 10
+
+	[Line: XML Data7]
+
+		Fields 	: XML Data
+		Local	: Field		: XML Data	: Set as	: "<MOBILE>990201234</MOBILE>"
+		Local	: Field		: XML Data	: Indent	: 10
+
+	[Line: XML Data8]
+
+		Fields 	: XML Data
+		Local	: Field		: XML Data	: Set as	: "</PHONE>"
+		Local	: Field		: XML Data	: Indent	: 5
+
+	[Line: XML Data9]
+
+		Fields 	: XML Data
+		Local	: Field		: XML Data	: Set as	: "- <ADDRESS>"
+		Local	: Field		: XML Data	: Indent	: 5
+
+	[Line: XML Data10]
+
+		Fields 	: XML Data
+		Local	: Field		: XML Data	: Set as	: "<ADDRLINE>C/o. Info Solutions</ADDRLINE>"
+		Local	: Field		: XML Data	: Indent	: 10
+
+	[Line: XML Data11]
+
+		Fields 	: XML Data
+		Local	: Field		: XML Data	: Set as	: "<ADDRLINE>Technology Street</ADDRLINE>"
+		Local	: Field		: XML Data	: Indent	: 10
+
+	[Line: XML Data12]
+
+		Fields 	: XML Data
+		Local	: Field		: XML Data	: Set as	: "<ADDRLINE>Tech Info Park</ADDRLINE>"
+		Local	: Field		: XML Data	: Indent	: 10
+
+	[Line: XML Data13]
+
+		Fields 	: XML Data
+		Local	: Field		: XML Data	: Set as	: "</ADDRESS>"
+		Local	: Field		: XML Data	: Indent	: 5
+
+	[Line: XML Data14]
+
+		Fields 	: XML Data
+		Local	: Field		: XML Data	: Set as	: "</CUSTOMER>"
+
+;; End-of-File

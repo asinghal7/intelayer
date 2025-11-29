@@ -1,0 +1,139 @@
+;; Sri Ganeshji : Sri Balaji : Sri Pitreshwarji : Sri Durgaji : Sri Venkateshwara
+
+/*
+
+Post Request and Get Response from Remote URL with Pre Request Report:
+
+This program demonstrates the capability of XML Collection to post data from Tally to a Predefined URL
+and retrieve the response XML in Collection.Also a Pre Request Report is used to accept User Inputs
+which are posted.
+
+Further it displays the data fetched in a Report 
+
+*/
+
+;;Report Displaying XML response fetched 
+
+[Report: XML Post PreReq Collection]
+
+	Form 	: XML Post PreReq Collection
+	Title 	: "Post Request with Pre-Request Report"
+
+[Form: XML Post PreReq Collection]
+
+	Part		: XML Post PreReq Collection
+	Bottom Parts: XML Code1
+	Height		: 100% Screen
+	Width		: 100% Screen
+
+[Part: XML Post PreReqCollection]
+
+	Lines	: XML Post PreReq Collection
+	Repeat	: XML Post PreReq Collection 	: XML Post PreReqCollection
+	Scroll  : Vertical
+	Width 	: 100% Screen
+
+	[Line: XML Post PreReq Collection]
+
+		Fields	: XML Name, XMLEmp ID
+		Explode : XML Phone
+		Explode : XML Add
+
+[Part: XML Code1]
+
+	Use 	: XML Code
+	Width 	: 100% Screen
+	Local 	: Line	: XML Data		: Local	: Field : XML Data		: Set As : "XML Response from the Remote Server"
+	Local 	: Line	: XML Request3	: Local	: Field	: XML Request 	: Set As : "<NAME>" + ##PreReqNameVar+ " </NAME>"
+	Local 	: Line	: XML Request4	: Local	: Field	: XML Request 	: Set As : "<EMPID>" + ##PreReqEmpIdVar + " </EMPID>"
+	Local 	: Line	: XML Data2		: Local	: Field	: XML Data		: Set As : "<NAME>" + ##PreReqNameVar+ " </NAME>"
+	Local 	: Line	: XML Data3		: Local	: Field	: XML Data		: Set As : "<EMPID>" + ##PreReqEmpIdVar + " </EMPID>"
+
+;;Collection retrieving XML response from a predefined URL 
+
+[Collection: XML Post PreReqCollection]
+
+	Remote URL   	: "http://192.168.2.108/CXMLResponse.php"    ;;URL Specification
+	RemoteRequest  	: XMLPostReqRep1, XML PreReqRep : ASCII  ;;Pre Request Report and Post Request Report Specification
+
+;;POST Request Report 
+
+[Report: XMLPostReqRep1]
+
+	Form  	: XMLPostReqRep1
+		
+[Form: XMLPostReqRep1]
+
+    Parts 	: XMLPostReqRep1
+
+[Part: XMLPostReqRep1]
+
+    Lines	:  XMLPostReqRep1
+	Scroll	:  Vertical
+	XML Tag :  "REQUEST"
+
+	[Line: XMLPostReqRep1]
+
+		Fields 	: Short Name Field, XMLPostReqRepName1, Name Field, XMLPostReqRepEid1
+
+		Local 	: Field	: Short Name Field 	: Set As 	: "Name :"
+		Local 	: Field	: Name Field 		: Set As 	: "Employee ID"
+
+      	[Field: XMLPostReqRepName1]
+
+           	Set As 	 :  ##PreReqNameVar
+  			XML Tag	 : "NAME"
+
+		[Field: XMLPostReqRepEid1]
+	
+			 Set as		:  ##PreReqEmpIdVar
+		     XML Tag 	:  "EMPID "
+
+;;Pre Request Report accepting User Inputs  
+
+[Report: XML PreReqRep]
+
+	Form  	: XML PreReqRep
+
+[Form: XML PreReqRep]
+
+	Parts 	: XML PreReqRep
+ 
+[Part: XML PreReqRep]
+
+	Lines	:  XML PreReqRepName, XML PreReqRepEmpID
+
+	[Line: XML PreReqRepName]
+
+		Fields 	: Short Name Field, PreReqName
+		Local 	: Field 	: Short Name Field 	: Info 		: "Name"
+
+		[Field: PreReqName]
+
+			Use  		: Name Field
+        	Set As 		: "Enter your Name"
+			Width 		: 50
+  			Modifies 	: PreReqNameVar
+
+	[Line: XML PreReqRepEmpID]
+
+		Fields	: Short Name Field, PreReqEmpID
+		Local 	: Field 	: Short Name Field 	: Info 		: "Employee Id"
+
+		[Field: PreReqEmpId]
+
+			Use  		: Name Field
+            Set As 	 	: "Enter your Employee Id"
+			Width 		: 50
+	  		Modifies  	: PreReqEmpIdVar
+
+[System: Variable]
+
+	PreReqNameVar : ""
+	PreReqEmpIdVar: ""
+
+[Variable: PreReqNameVar]
+
+[Variable: PreReqEmpIdVar]
+
+;; End-of-File

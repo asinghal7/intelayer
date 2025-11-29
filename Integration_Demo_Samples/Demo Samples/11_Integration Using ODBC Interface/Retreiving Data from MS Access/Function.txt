@@ -1,0 +1,39 @@
+
+[#Menu: Gateway of Tally]
+	Add	: Button	: Led Import 
+
+
+[Button: Led Import]
+	Key	: Alt + F5
+	Action	: Call	: Ledger Import
+	Title	: "Led Import From MS Access"
+
+
+
+[Function: Ledger Import]
+	01 : WALK COLLECTION: Led Coll
+	02 : IF : @@LedgerExists > 0
+	03 : NEW OBJECT: Ledger : $LedName
+	04 : CALL : Set Values
+	05 : SAVE TARGET
+	06 : ELSE
+	07 : NEW OBJECT: Ledger
+	08 : CALL : Set Values
+	09 : SAVE TARGET
+	10 : END IF
+	11 : END WALK
+	12 : MSGBOX : "Status" : "Process completed successfully!!"
+	13 : RETURN
+
+[Function : Set Values]
+	01 : SET VALUE : Name : $LedName
+	02 : SET VALUE : Parent: $LedParent
+	03 : SET VALUE : Opening Balance : $LedOpBal
+
+[System : Formula]
+	Ledger Exists 	: $$FilterCount:Ledger:IsMyLedger
+	IsMyLedger 	: $Name = $$ReqObject:$LedName
+
+
+
+

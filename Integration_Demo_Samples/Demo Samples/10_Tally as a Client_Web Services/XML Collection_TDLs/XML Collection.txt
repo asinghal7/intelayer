@@ -1,0 +1,38 @@
+;; Sri Ganeshji : Sri Balaji : Sri Pitreshwarji : Sri Durgaji : Sri Venkateshwara
+
+;; Menu Definition for XML Collection
+[#Menu:Gateway of Tally]
+	Add : Key Item	: XML Collection	:X:  Menu	: XML Collection1
+
+[Menu: XML Collection1]
+
+	Key Item 	: Simple Get 					: S : Display 	: XML Get Collection
+	Item 		: Blank
+
+	Key Item 	: Retrieve XML Fragment			: G : Display 	: XML Get CollObjPath
+	Item 		: Blank
+
+	Key Item 	: Simple Get with Object Spec 	: O : Display 	: XML Get CollObjSpec
+	Item 		: Blank
+
+	Key Item 	: Simple Post					: L : Display 	: XML Post Collection
+	Item 		: Blank
+
+	Key Item 	: Post with Pre-Request Report	: P : Display 	: XML Post PreReq Collection
+	Item 		: Blank
+	
+	Key Item 	: Action HTTP Post 				: H : Display 	: HTTP Post Welcome
+	Item 		: Blank
+	Item 		: Blank
+
+[Include: XML Data.txt]
+[Include: Simple Get.txt]
+[Include: Retrieve XML Fragment.txt]
+[Include: Simple Get With Obj Spec.txt]
+
+[Include: XML Request To Server.txt]
+[Include: Simple Post.txt]
+[Include: Post with Pre-Request Report.txt]
+[Include: Action HTTP Post.txt]
+
+;; End-of-File

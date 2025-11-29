@@ -1,0 +1,62 @@
+;; Sri Ganeshji : Sri Balaji : Sri Pitreshwarji : Sri Durgaji : Sri Venkateshwara
+
+/*
+
+XML Request Format:
+
+Request XML file format on Tally Screen
+
+*/
+
+[Part: XML Request]
+
+	Lines		: XML Request, XML Request 1, XML Request 2, XML Request 3
+	Lines 		: XML Request 4, XML Request 5, XML Request 6
+	Border 		: Thin Cover
+	Space Left 	: 10
+
+	[Line: XML Request]
+
+		Fields	: XML Request
+		Local	: Field	: XML Request	: Style		: Normal Bold
+
+		[Field: XML Request]
+
+			Set As 	: "XML Request sent to Remote Server"
+
+	[Line: XML Request1]
+
+		Fields	: XML Request
+		Local	: Field	: XML Request	: Set As	: "<ENVELOPE>"
+		SpaceTop: 1
+
+	[Line: XML Request2]
+
+		Fields	: XML Request
+		Local	: Field	: XML Request	: Set As	: "<REQUEST>"
+		Local	: Field	: XML Request	: Indent  	: 5
+
+	[Line: XML Request3]
+
+		Fields	: XML Request
+		Local	: Field	: XML Request	: Set As	: "<NAME>Sapna Awasthi</NAME>"
+		Local	: Field	: XML Request	: Indent  	: 10
+
+	[Line: XML Request4]
+
+		Fields	: XML Request
+		Local	: Field	: XML Request	: Set As	: "<EMPID>1000</EMPID>"
+		Local	: Field	: XML Request	: Indent  	: 10
+
+	[Line: XML Request5]
+
+		Fields	: XML Request
+		Local	: Field	: XML Request	: Set As	: "</REQUEST>"
+		Local	: Field	: XML Request	: Indent  	: 5
+
+	[Line: XML Request6]
+
+		Fields	: XML Request
+		Local	: Field	: XML Request	: Set As	: "</ENVELOPE>"
+
+;; End-of-File

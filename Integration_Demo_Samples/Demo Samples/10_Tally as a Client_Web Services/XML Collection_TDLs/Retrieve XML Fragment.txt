@@ -1,0 +1,77 @@
+;; Sri Ganeshji : Sri Balaji : Sri Pitreshwarji : Sri Durgaji : Sri Venkateshwara
+
+/*
+
+Get a fragment of XML from Remote URL:
+
+This program demonstrates the capability of XML Collection to retrieve only a fragment of 
+the data from XML File present at a specified URL.
+
+Further it displays the data fetched in a Report 
+
+*/
+
+;;Report Displaying XML Data
+
+[Report: XML Get CollObjPath]
+
+	Form 	: XML Get CollObjPath
+	Title 	: "Simple Get Request With Object Path"
+
+[Form: XML Get CollObjPath]
+
+	Height	: 100% Screen
+	Width	: 100% Screen
+	Parts	: XML Get CollObjPath, XML Data
+
+[Part: XML Get CollObjPath]
+
+	Lines	: XML Get CollObjPathTitle, XML Get CollObjPath
+	Repeat	: XML Get CollObjPath	: XML Get CollObjPath
+	Scroll  : Vertical
+
+	[Line: XML Get CollObjPathTitle]
+
+		Fields	: XML Get CollObjPathTitle
+
+		[Field: XML Get CollObjPathTitle]
+
+			Set As 	: "Retrive fragment ADDRESS from XML data"
+			Align 	: Center
+			Style	: Normal Bold
+
+	[Line: XML Get CollObjPath]
+
+		Fields	: XML COP Add1
+		Explode : XML COPAddr Line
+
+		[Field: XML COP Add1]
+
+			Use 	: Name Field
+			Set As 	: "Address"
+
+;; Explode Part - XML COP Addr Line
+
+[Part: XML COP Addr Line]
+
+	Lines	: XML Get  COPAddrline
+	Repeat 	: XML Get COP Addrline 	: AddrLine
+	Scroll	: Vertical
+
+	[Line: XML Get COP Addrline]
+
+		Fields	: XML COP Add2
+
+		[Field: XML COP Add2]
+
+			Set As 	: $AddrLine
+			Indent 	: 5
+
+;;Collection retrieving data from an XML file located at a predefined URL  
+					   			
+[Collection: XML Get CollObjPath]
+
+	Remote URL   	: "http://192.168.2.108/TestXML.xml"  ;;URL Specification
+	XML Object Path : ADDRESS:1:CUSTOMER              ;; Path Specification to retrieve Address only
+
+;; End-of-File

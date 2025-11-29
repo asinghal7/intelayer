@@ -1,0 +1,33 @@
+;; Sri Ganeshji : Sri Balaji : Sri Pitreshwarji : Sri Durgaji : Sri Venkateshwara
+
+[Report: List of Ledgers]
+
+	Form	: List of Ledgers
+
+[Form: List of Ledgers]
+  
+	Parts	: List of Ledgers
+	XMLTag	: "List of Ledgers"
+
+[Part: List of Ledgers]
+
+	Lines	: List of Ledgers
+	Repeat	: List of Ledgers	: Collection of Ledgers
+	Scroll	: Vertical
+
+	[Line: List of Ledgers]
+	
+		Fields	: List of Ledgers
+	
+		[Field: List of Ledgers]
+		
+			Set as	: $Name
+			XMLTag	: "NAME"
+
+;; Collection Definition
+
+[Collection: Collection of Ledgers]
+
+	Type	: Ledger
+
+;; End-of-File

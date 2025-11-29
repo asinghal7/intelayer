@@ -1,0 +1,46 @@
+<ENVELOPE>
+    <HEADER>
+        <VERSION>1</VERSION>
+        <TALLYREQUEST>Export</TALLYREQUEST>
+        <TYPE>Data</TYPE>
+        <ID>MyReportUnits</ID>
+    </HEADER>
+    <BODY>
+        <DESC>
+            <STATICVARIABLES>
+                <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
+                <SVCURRENTCOMPANY>{{ company }}</SVCURRENTCOMPANY>
+            </STATICVARIABLES>
+            <TDL>
+                <TDLMESSAGE>
+                    <REPORT NAME="MyReportUnits">
+                        <FORMS>MyFormUnits</FORMS>
+                    </REPORT>
+                    <FORM NAME="MyFormUnits">
+                        <PARTS>MyPartUnits</PARTS>
+                    </FORM>
+                    <PART NAME="MyPartUnits">
+                        <LINES>MyLineUnits</LINES>
+                        <REPEAT>MyLineUnits : MyCollUnits</REPEAT>
+                        <SCROLLED>Vertical</SCROLLED>
+                    </PART>
+                    <LINE NAME="MyLineUnits">
+                        <FIELDS>FldName, FldGUID, FldAlterId, FldOriginalName, FldIsSimpleUnit, FldBaseUnits, FldAdditionalUnits, FldConversion, FldDecimalPlaces</FIELDS>
+                    </LINE>
+                    <FIELD NAME="FldName"><SET>$Name</SET><XMLTAG>NAME</XMLTAG></FIELD>
+                    <FIELD NAME="FldGUID"><SET>$GUID</SET><XMLTAG>GUID</XMLTAG></FIELD>
+                    <FIELD NAME="FldAlterId"><SET>if $$IsEmpty:$AlterId then "0" else $$String:$AlterId</SET><XMLTAG>ALTERID</XMLTAG></FIELD>
+                    <FIELD NAME="FldOriginalName"><SET>$OriginalName</SET><XMLTAG>ORIGINALNAME</XMLTAG></FIELD>
+                    <FIELD NAME="FldIsSimpleUnit"><SET>if $IsSimpleUnit then "Yes" else "No"</SET><XMLTAG>ISSIMPLEUNIT</XMLTAG></FIELD>
+                    <FIELD NAME="FldBaseUnits"><SET>$BaseUnits</SET><XMLTAG>BASEUNITS</XMLTAG></FIELD>
+                    <FIELD NAME="FldAdditionalUnits"><SET>$AdditionalUnits</SET><XMLTAG>ADDITIONALUNITS</XMLTAG></FIELD>
+                    <FIELD NAME="FldConversion"><SET>if $$IsEmpty:$Conversion then "0" else $$String:$Conversion</SET><XMLTAG>CONVERSION</XMLTAG></FIELD>
+                    <FIELD NAME="FldDecimalPlaces"><SET>if $$IsEmpty:$DecimalPlaces then "2" else $$String:$DecimalPlaces</SET><XMLTAG>DECIMALPLACES</XMLTAG></FIELD>
+                    <COLLECTION NAME="MyCollUnits">
+                        <TYPE>Unit</TYPE>
+                    </COLLECTION>
+                </TDLMESSAGE>
+            </TDL>
+        </DESC>
+    </BODY>
+</ENVELOPE>

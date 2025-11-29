@@ -1,0 +1,65 @@
+;; Sri Ganeshji : Sri Balaji : Sri Pitreshwarji : Sri Durgaji : Sri Venkateshwara
+
+/*
+
+Get from Remote URL and Map to TDL Object:
+
+This program demonstrates the capability of XML Collection to retrieve the data from XML File 
+
+present at a specified URL.Further it displays the data fetched in a Report 
+
+Also Maps the response XML to a TDL Object
+*/
+ 
+;;Report Displaying XML Data 
+
+[Report: XML Get CollObjSpec]
+
+	Form 	: XML Get CollObjSpec
+	Title 	: "Simple Get Request With Object Specification"
+
+[Form: XML Get CollObjSpec]
+
+	Parts	: XML Get CollObjSpec, XML Data
+	Height	: 100% Screen
+	Width	: 100% Screen
+	
+[Part: XML Get CollObjSpec]
+
+	Lines	: XML Get CollObjSpec
+	Repeat	: XML Get CollObjSpec	: XML Get CollObjSpec	
+	Scroll  : Vertical
+
+	[Line: XML Get CollObjSpec]
+
+		Fields	: XML Name, XMLEmp ID
+		Explode : XML Phone
+		Explode : XML Add
+
+;;Collection retrieving data from an XML file located at a predefined URL 
+
+[Collection: XML Get CollObjSpec]
+
+	Remote URL   : "http://192.168.2.108/TestXML.xml"  ;;URL specification
+	XML Object   : Customer Data                   ;;TDL Object Specification 
+
+;;Specification starts here
+
+[Object: Customer Data]
+
+    Storage  	: Name      : String
+    Storage 	: EmpId 	: String
+    Collection 	: Phone    	: XML Phone Coll      ;; Complex Collection
+    Collection 	: Address 	: XML AddressColl     ;; Complex Collection
+
+[Object: XML Phone Coll]
+
+    Storage 	: OfficeNo 	: String
+    Storage 	: HomeNo 	: String
+    Storage 	: Mobile    : String
+ 
+[Object: XML AddressColl]
+
+   Collection 	: AddrLine	: String   			;; Simple Collection
+
+;; End-of-File

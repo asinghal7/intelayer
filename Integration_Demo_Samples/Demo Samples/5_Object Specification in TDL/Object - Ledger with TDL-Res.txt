@@ -1,0 +1,20 @@
+<ENVELOPE>
+ <HEADER>
+  <VERSION>1</VERSION>
+  <STATUS>1</STATUS>
+ </HEADER>
+ <BODY>
+  <DESC>
+  </DESC>
+  <DATA>
+   <TALLYMESSAGE>
+    <LEDGER NAME="ABC India Pvt. Ltd." RESERVEDNAME="">
+     <NAME.LIST TYPE="String">
+      <NAME>ABC India Pvt. Ltd.</NAME>
+     </NAME.LIST>
+     <TNETBALANCE TYPE="Amount">0.00</TNETBALANCE>
+    </LEDGER>
+   </TALLYMESSAGE>
+  </DATA>
+ </BODY>
+</ENVELOPE>

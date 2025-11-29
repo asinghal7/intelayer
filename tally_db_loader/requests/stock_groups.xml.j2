@@ -1,0 +1,43 @@
+<ENVELOPE>
+    <HEADER>
+        <VERSION>1</VERSION>
+        <TALLYREQUEST>Export</TALLYREQUEST>
+        <TYPE>Data</TYPE>
+        <ID>MyReportStockGroups</ID>
+    </HEADER>
+    <BODY>
+        <DESC>
+            <STATICVARIABLES>
+                <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
+                <SVCURRENTCOMPANY>{{ company }}</SVCURRENTCOMPANY>
+            </STATICVARIABLES>
+            <TDL>
+                <TDLMESSAGE>
+                    <REPORT NAME="MyReportStockGroups">
+                        <FORMS>MyFormStockGroups</FORMS>
+                    </REPORT>
+                    <FORM NAME="MyFormStockGroups">
+                        <PARTS>MyPartStockGroups</PARTS>
+                    </FORM>
+                    <PART NAME="MyPartStockGroups">
+                        <LINES>MyLineStockGroups</LINES>
+                        <REPEAT>MyLineStockGroups : MyCollStockGroups</REPEAT>
+                        <SCROLLED>Vertical</SCROLLED>
+                    </PART>
+                    <LINE NAME="MyLineStockGroups">
+                        <FIELDS>FldName, FldGUID, FldParent, FldAlterId, FldIsAddable, FldBaseUnits</FIELDS>
+                    </LINE>
+                    <FIELD NAME="FldName"><SET>$Name</SET><XMLTAG>NAME</XMLTAG></FIELD>
+                    <FIELD NAME="FldGUID"><SET>$GUID</SET><XMLTAG>GUID</XMLTAG></FIELD>
+                    <FIELD NAME="FldParent"><SET>$Parent</SET><XMLTAG>PARENT</XMLTAG></FIELD>
+                    <FIELD NAME="FldAlterId"><SET>if $$IsEmpty:$AlterId then "0" else $$String:$AlterId</SET><XMLTAG>ALTERID</XMLTAG></FIELD>
+                    <FIELD NAME="FldIsAddable"><SET>if $IsAddable then "Yes" else "No"</SET><XMLTAG>ISADDABLE</XMLTAG></FIELD>
+                    <FIELD NAME="FldBaseUnits"><SET>$BaseUnits</SET><XMLTAG>BASEUNITS</XMLTAG></FIELD>
+                    <COLLECTION NAME="MyCollStockGroups">
+                        <TYPE>StockGroup</TYPE>
+                    </COLLECTION>
+                </TDLMESSAGE>
+            </TDL>
+        </DESC>
+    </BODY>
+</ENVELOPE>

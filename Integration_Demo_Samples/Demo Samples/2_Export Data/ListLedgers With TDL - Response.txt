@@ -1,0 +1,258 @@
+<LISTOFLEDGERS>
+ <NAME>ABC India Pvt. Ltd.</NAME>
+ <NAME>Accum. Dep. on Airconditioner</NAME>
+ <NAME>Accum. Dep. on Building</NAME>
+ <NAME>Accum. Dep. on Computer &amp; Per.</NAME>
+ <NAME>Accum. Dep. on Furn. &amp; Fixt.</NAME>
+ <NAME>Accum. Dep. on Motor Car</NAME>
+ <NAME>Accum. Dep. on P &amp; M - I</NAME>
+ <NAME>Accum. Dep. on P &amp; M - II</NAME>
+ <NAME>Advance Tax</NAME>
+ <NAME>Advertisement Charges</NAME>
+ <NAME>Adview Consultants</NAME>
+ <NAME>Airconditioner</NAME>
+ <NAME>All India Computer Institute</NAME>
+ <NAME>Amar Computer Peripherals</NAME>
+ <NAME>Amrita</NAME>
+ <NAME>Arvind Kumar</NAME>
+ <NAME>Ashok Financiers</NAME>
+ <NAME>Assembling Charges</NAME>
+ <NAME>Avanthi Constructions</NAME>
+ <NAME>AVT Computers</NAME>
+ <NAME>Balasubramanian&apos;s Share Capital A/c</NAME>
+ <NAME>Bank Charges</NAME>
+ <NAME>Basic Pay</NAME>
+ <NAME>Batliwala &amp; Co.</NAME>
+ <NAME>Best Systems Pvt Ltd</NAME>
+ <NAME>B.Ganesh</NAME>
+ <NAME>Bharat Petroleum</NAME>
+ <NAME>Bill Collection</NAME>
+ <NAME>Bonus</NAME>
+ <NAME>Bonus Paid</NAME>
+ <NAME>B Ramesh - Loan</NAME>
+ <NAME>Building</NAME>
+ <NAME>Business Promotion Expenses</NAME>
+ <NAME>Canara Bank</NAME>
+ <NAME>Capital</NAME>
+ <NAME>Carriage Inwards</NAME>
+ <NAME>Cash</NAME>
+ <NAME>Cash Sales</NAME>
+ <NAME>Challenger Systems</NAME>
+ <NAME>Chandra Timbers</NAME>
+ <NAME>Cholamandalam Auto Finance Coy.,</NAME>
+ <NAME>Citi Bank Credit Card</NAME>
+ <NAME>Commission Paid</NAME>
+ <NAME>Computer Junction</NAME>
+ <NAME>Computer Point</NAME>
+ <NAME>Computers &amp; Peripherals</NAME>
+ <NAME>Computer World</NAME>
+ <NAME>Concrete Solutions</NAME>
+ <NAME>Conveyance</NAME>
+ <NAME>CST 4% on Purchases</NAME>
+ <NAME>CST Tax @ 4%</NAME>
+ <NAME>Customer A</NAME>
+ <NAME>Damro Furniture (P) Ltd.,</NAME>
+ <NAME>Dd</NAME>
+ <NAME>DEF Ltd</NAME>
+ <NAME>Dep. on Airconditioner</NAME>
+ <NAME>Dep. on  Building</NAME>
+ <NAME>Dep. on Computers &amp; Pher.</NAME>
+ <NAME>Dep. on Furniture &amp; Fixt.</NAME>
+ <NAME>Dep. on Motor Car</NAME>
+ <NAME>Dep. on Plant &amp; Machinery - I</NAME>
+ <NAME>Dep on Plant &amp; Machinery - II</NAME>
+ <NAME>Depreciation</NAME>
+ <NAME>Discount</NAME>
+ <NAME>DLI Contribution @ 0.5%</NAME>
+ <NAME>Donations</NAME>
+ <NAME>EDLI Admin Charges @ 0.01%</NAME>
+ <NAME>Educ. Cess @ 2%</NAME>
+ <NAME>Electricity Charges</NAME>
+ <NAME>Employee&apos;s ESI Contribution @ 1.75%</NAME>
+ <NAME>Employee&apos;s PF Contribution @ 12%</NAME>
+ <NAME>Employees&apos; Cont. Prov Fund</NAME>
+ <NAME>Employer&apos;s Cont. Prov. Fund</NAME>
+ <NAME>Employer EPF @ 3.67%</NAME>
+ <NAME>Employer ESI @ 4.75%</NAME>
+ <NAME>Employer FPF @ 8.33%</NAME>
+ <NAME>ESI Payable</NAME>
+ <NAME>Eternal Consultants</NAME>
+ <NAME>Excess Provision No Longer Required</NAME>
+ <NAME>Excise Duty @ 16%</NAME>
+ <NAME>Fast Couriers</NAME>
+ <NAME>FBT Ledger</NAME>
+ <NAME>Forex Gain/Loss</NAME>
+ <NAME>Fortune Computer Services</NAME>
+ <NAME>Freight Outwards</NAME>
+ <NAME>Furniture &amp; Fixtures</NAME>
+ <NAME>Futura Systems</NAME>
+ <NAME>Fuzitsy Systems</NAME>
+ <NAME>Gaitonde Traders</NAME>
+ <NAME>Global Associates</NAME>
+ <NAME>Global Traders</NAME>
+ <NAME>Global Traders (Loan A/c)</NAME>
+ <NAME>Gratuity Expenses (Provisional)</NAME>
+ <NAME>Group Term SuperAnnuation Exp</NAME>
+ <NAME>HDFC Bank</NAME>
+ <NAME>HDFC Silver Credit Card</NAME>
+ <NAME>Hindustan Timbers</NAME>
+ <NAME>Horizon Systems</NAME>
+ <NAME>House Rent Allowance</NAME>
+ <NAME>HP India Ltd.,</NAME>
+ <NAME>Hyundai Motors (I) Pvt. Ltd.,</NAME>
+ <NAME>ICICI</NAME>
+ <NAME>Incomes From Retail Trade</NAME>
+ <NAME>Infinite Infosolutions</NAME>
+ <NAME>Input ST - Courier Charges</NAME>
+ <NAME>Input ST - Telephone Charges</NAME>
+ <NAME>Input VAT @ 12.5%</NAME>
+ <NAME>Input VAT @ 4%</NAME>
+ <NAME>Input VAT - Capital Goods @ 4%</NAME>
+ <NAME>Insurance Premium</NAME>
+ <NAME>Interest Accrued</NAME>
+ <NAME>Interest Due</NAME>
+ <NAME>Interest &amp; Finance Charges</NAME>
+ <NAME>Interest on Bank Overdraft</NAME>
+ <NAME>Interest on Car Loan A/c</NAME>
+ <NAME>Interest on Partner&apos;s Capital A/c</NAME>
+ <NAME>Interest on Unsecured Loans</NAME>
+ <NAME>Interest &amp; Others</NAME>
+ <NAME>Interest Payable</NAME>
+ <NAME>Interest Receivable</NAME>
+ <NAME>Interest Received</NAME>
+ <NAME>Interstate Sales @ 4%</NAME>
+ <NAME>Investments</NAME>
+ <NAME>Jain Realtors</NAME>
+ <NAME>Janata Timbers</NAME>
+ <NAME>Jet Roadways (P) Ltd.,</NAME>
+ <NAME>Jj</NAME>
+ <NAME>Jomy</NAME>
+ <NAME>Kavitha&apos;s Share Capital A/c</NAME>
+ <NAME>K.P.Bhutia</NAME>
+ <NAME>Labour Charges Received</NAME>
+ <NAME>Land &amp; Building</NAME>
+ <NAME>Land - I</NAME>
+ <NAME>Land - II</NAME>
+ <NAME>Legal Fees</NAME>
+ <NAME>Mahaveer Computers</NAME>
+ <NAME>Mahesh Timbers</NAME>
+ <NAME>Mani Electricals</NAME>
+ <NAME>Manjunath Systems</NAME>
+ <NAME>Maruthi Bankers</NAME>
+ <NAME>Maruthi Traders</NAME>
+ <NAME>Maruti Udyog Service Centre</NAME>
+ <NAME>Miscellaneous Expenses</NAME>
+ <NAME>M.M.Lal</NAME>
+ <NAME>MNO Ltd</NAME>
+ <NAME>Modern Advertisers</NAME>
+ <NAME>Mohan&apos;s Current A/c</NAME>
+ <NAME>Mohan&apos;s Share Capital A/c</NAME>
+ <NAME>Motor Car - Hyundai GLX</NAME>
+ <NAME>Narayan</NAME>
+ <NAME>Navin Traders</NAME>
+ <NAME>Nayak Trading Co.,</NAME>
+ <NAME>N.C.Jain</NAME>
+ <NAME>New Buzz Traders</NAME>
+ <NAME>New Era Computers</NAME>
+ <NAME>NextGen Systems</NAME>
+ <NAME>Nirmaan Timbers</NAME>
+ <NAME>NSC</NAME>
+ <NAME>Office Automation Systems</NAME>
+ <NAME>Office Rent</NAME>
+ <NAME>Office Repairs &amp; Maintenance</NAME>
+ <NAME>OTHER INCOME</NAME>
+ <NAME>Output ST - Advt. Services</NAME>
+ <NAME>Output VAT @ 12.5%</NAME>
+ <NAME>Output VAT @ 4%</NAME>
+ <NAME>Overtime Pay</NAME>
+ <NAME>Packing Charges</NAME>
+ <NAME>Paneer Selvam &amp; Associates</NAME>
+ <NAME>Pee Jee  Transports</NAME>
+ <NAME>Petrol Expenses</NAME>
+ <NAME>Petty Cash</NAME>
+ <NAME>PF Admin Charges @ 1.10%</NAME>
+ <NAME>PF Admin Expense</NAME>
+ <NAME>PF Employers</NAME>
+ <NAME>PF Payable</NAME>
+ <NAME>Plant &amp; Machinery - I</NAME>
+ <NAME>Plant &amp; Machinery - II</NAME>
+ <NAME>Postage &amp; Telegraph</NAME>
+ <NAME>Prepaid Expenditure</NAME>
+ <NAME>Prism Softlinks</NAME>
+ <NAME>Priya Ganesh&apos;s Share Capital A/c</NAME>
+ <NAME>Priya Ganesh Loan</NAME>
+ <NAME>Professional &amp; Consultancy Charges</NAME>
+ <NAME>Profession Tax</NAME>
+ <NAME>Profit &amp; Loss A/c</NAME>
+ <NAME>Profit on Sale of Assets</NAME>
+ <NAME>Profit on Sale of Fixed Assets</NAME>
+ <NAME>Provision for Outstanding Expenditure</NAME>
+ <NAME>Purchase @ 12.5%</NAME>
+ <NAME>Purchase @ 4%</NAME>
+ <NAME>Purchase - Courier Charges</NAME>
+ <NAME>Purchase - Interstate</NAME>
+ <NAME>Purchase - Local</NAME>
+ <NAME>Purchase - Telephone Services</NAME>
+ <NAME>Rates &amp; Taxes</NAME>
+ <NAME>Refund of Sales Tax</NAME>
+ <NAME>Repairs &amp; Maintenance</NAME>
+ <NAME>Repairs &amp; Maintenance - Buildings</NAME>
+ <NAME>Repairs &amp; Maintenance - Electrical</NAME>
+ <NAME>Resale Tax @ 1%</NAME>
+ <NAME>Research &amp; Development Expenses</NAME>
+ <NAME>RK Builders Pvt Ltd</NAME>
+ <NAME>Rounding Off</NAME>
+ <NAME>Sai Infotech (P) Ltd.,</NAME>
+ <NAME>Salaries</NAME>
+ <NAME>Salary Payable</NAME>
+ <NAME>Sales @ 12.5%</NAME>
+ <NAME>Sales @ 4%</NAME>
+ <NAME>Sales - Advertising Services</NAME>
+ <NAME>Sales Current</NAME>
+ <NAME>Sales - Exports</NAME>
+ <NAME>Samsung (I) Pvt. Ltd.,</NAME>
+ <NAME>Sathish&apos;s Current A/c</NAME>
+ <NAME>Sathish&apos;s Share Capital A/c</NAME>
+ <NAME>SBI Loans</NAME>
+ <NAME>Shankar</NAME>
+ <NAME>Silverplus Computers</NAME>
+ <NAME>Simco Machinery Co.,</NAME>
+ <NAME>Soft Stop</NAME>
+ <NAME>Sri Vari Financiers</NAME>
+ <NAME>Staff Salary Advance</NAME>
+ <NAME>Staff Welfare Expenses</NAME>
+ <NAME>State Bank of India</NAME>
+ <NAME>Step-in Computers</NAME>
+ <NAME>Sterling Business Solutions</NAME>
+ <NAME>St Fo Advt</NAME>
+ <NAME>Stock in Hand</NAME>
+ <NAME>Subscriptions</NAME>
+ <NAME>Sundry Creditors (Purchase Expenses)</NAME>
+ <NAME>Supplier A</NAME>
+ <NAME>Supplier - Stationery</NAME>
+ <NAME>Supreme Computers Peripherals</NAME>
+ <NAME>Suresh</NAME>
+ <NAME>Suresh&apos;s Share Capital A/c</NAME>
+ <NAME>S.V.S Computers</NAME>
+ <NAME>TCS 2.5% on Purchases</NAME>
+ <NAME>TCS @ 2.5%</NAME>
+ <NAME>TDS on Commission</NAME>
+ <NAME>Telco  Engineering Works</NAME>
+ <NAME>Telephone Link Ltd.,</NAME>
+ <NAME>The League Club</NAME>
+ <NAME>Top Computers</NAME>
+ <NAME>Training &amp; Orientation Expenses</NAME>
+ <NAME>Transportation &amp; Packaging</NAME>
+ <NAME>Travelling &amp; Conveyance</NAME>
+ <NAME>TVS Electronics (I) Ltd.,</NAME>
+ <NAME>Universal Computers</NAME>
+ <NAME>Universal Systems</NAME>
+ <NAME>Variable Pay</NAME>
+ <NAME>VAT Payable</NAME>
+ <NAME>Vehicle Repairs &amp; Maintenance</NAME>
+ <NAME>Venkateshwara Softwares</NAME>
+ <NAME>Vijayakumar&apos;s Share Capital A/c</NAME>
+ <NAME>Vinayaga Trading Corporation</NAME>
+ <NAME>Worldwide Computers</NAME>
+ <NAME>Zen Enterprises</NAME>
+</LISTOFLEDGERS>

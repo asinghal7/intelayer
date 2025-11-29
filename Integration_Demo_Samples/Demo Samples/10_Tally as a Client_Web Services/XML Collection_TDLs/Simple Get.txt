@@ -1,0 +1,113 @@
+;; Sri Ganeshji : Sri Balaji : Sri Pitreshwarji : Sri Durgaji : Sri Venkateshwara
+
+/*
+
+Get from Remote URL:
+
+This program demonstrates the capability of XML Collection to retrieve the data from XML File 
+
+present at a specified URL.Further it displays the data fetched in a Report 
+
+*/
+
+;;Report Displaying XML Data 
+
+[Report: XML Get Collection]
+
+	Form 	: XML Get Collection
+	Title 	: "Simple Get Request "
+
+[Form: XML Get Collection]
+
+	Height	: 100% Screen
+	Width	: 100% Screen
+	Parts	: XML Get Collection, XMLData
+		
+[Part: XML Get Collection]
+
+	Lines	: XML Get Collection 
+	Repeat	: XML Get Collection : XML Get Collection	
+	Scroll  : Vertical
+			
+	[Line: XML Get Collection]
+
+		Fields	: XML Name, XMLEmp ID
+		Explode : XML Phone
+		Explode : XML Add
+		
+		[Field: XMLName]
+
+			Set As 	: "Name : " + $NAME
+		
+		[Field: XMLEmp ID]
+
+			Set As 	: "Employee ID :" +  $EMPID
+			Indent 	: 10
+
+;; Explode Part - XML Phone
+
+[Part: XML Phone]
+
+	Lines 	: XML Get CollPhone
+	Repeat 	: XML Get CollPhone		: Phone
+	Scroll	: Vertical
+
+	[Line: XML Get CollPhone]
+
+		Fields	: Name Field , XML Office,XML Home, XML Mobile
+		Local 	: Field	: Name Field	: Set As 	: "Phone No"
+			
+		[Field: XML Office]
+
+			Set As 	: "Office:" + $OfficeNo
+		
+		[Field: XML Home]
+
+			Set As 	: "Home :" + $HomeNo
+		
+		[Field: XML Mobile]
+
+			Set As 	: "Mobile :" + $Mobile				
+			
+;; Explode Part - XML Add
+
+[Part: XML Add]
+
+	Lines	: XML Get CollAdd
+	Repeat 	: XML Get CollAdd 	: Address
+	Scroll	: Vertical
+
+	[Line: XML Get CollAdd]
+
+		Fields	: XML Add1
+		Explode : XML Addr Line
+
+		[Field: XML Add1]
+
+			Use 	: Name Field
+			Set As 	: "Address"
+
+;; Explode Part - XML Addr Line
+
+[Part: XML Addr Line]
+
+	Lines	: XML Get Addrline
+	Repeat 	: XML Get Addrline 	: AddrLine
+	Scroll	: Vertical
+
+	[Line: XML Get Addrline]
+
+		Fields	: XML Add2
+
+		[Field: XML Add2]
+
+			Set As 	: $ADDRLINE
+			Indent 	: 5
+
+;;Collection retrieving data from an XML file located at a predefined URL 
+
+[Collection: XML Get Collection]
+
+	Remote URL   : "http://192.168.2.108/TestXML.xml"  ;;URL specification
+
+;; End-of-File

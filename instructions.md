@@ -1,230 +1,156 @@
+You are improving an existing Python ETL codebase that already fetches data from Tally and loads into Postgres. 
+Your task: ADD a minimal, production-ready AR/AP (Receivables/Payables) pipeline that can run TODAY without breaking anything else. 
+You MUST read existing files to align with the current architecture, naming, and helpers.
 
-You’re extending an existing Python + Postgres ETL that ALREADY fetches vouchers via Voucher Register and parses item-level details from each voucher (InventoryEntries). DO NOT introduce a new TDL or a different report. Reuse the current HTTP request & parsing logic that exists in the repo.
+----------------------------------------------------------------
+READ & ALIGN (do this first)
+----------------------------------------------------------------
+1) Open and read these files (if present):
+   - instructions.md (project guidance, naming, code style)
+   - adapter.py (existing Tally adapter or HTTP client)
+   - run.py (current ETL entrypoint)
+   - any utils (e.g., db.py, settings.py, logging config, constants, etc.)
 
-## Goal
-Persist the item lines you already parse from Voucher Register into a new table `fact_invoice_line`, so we can answer “who bought which SKU” with (invoice_id, customer, item/SKU, qty, uom, rate, pre_tax, tax, total, date).
+2) Determine:
+   - Existing DB layer: psycopg vs SQLAlchemy? Use the same one. 
+   - Existing env var pattern (.env, pydantic settings, or os.environ)? Reuse it.
+   - Existing logger (loguru, stdlib, structlog)? Reuse it.
+   - Existing folder structure (e.g., adapters/tally_http/, agent/etl/, sql/ddl/). Mirror it.
 
-## Constraints
-- Keep the existing headers flow (fact_invoice) as-is.
-- Use the same date-range CLI and company settings you already support in `run.py`.
-- Reuse DB helpers in `adapter.py`.
-- If you already have any staging tables, use them; otherwise create light stg tables below.
-- Avoid schema changes to existing tables unless adding safe indexes.
+3) DO NOT refactor unrelated code. Additive change only.
+   - If names already exist, prefer those. 
+   - If a helper exists (HTTP POST to Tally, Jinja templating, XML parser helper), reuse it.
+   - If a function exists with similar behavior, call it instead of duplicating logic.
 
-## Files to ADD
-1) `sql/0003_fact_invoice_line.sql`
-2) `etl/sales_lines_from_vreg.py`
-3) Update `run.py` to add a subcommand: `sales-lines-from-vreg`
+----------------------------------------------------------------
+SCOPE
+----------------------------------------------------------------
+Deliver an AR/AP pipeline that:
+- Pulls ledger master + outstanding receivables + outstanding payables (bill-wise) from Tally (XML).
+- Parses the bill-wise rows robustly (works across common Tally exports).
+- Upserts into Postgres with idempotency and safe DDL.
+- Produces tables enabling current receivable/payable and historical performance calculations.
 
-### 1) sql/0003_fact_invoice_line.sql
-Idempotent migration only.
+----------------------------------------------------------------
+FILES TO CREATE (Generate these; merge if they already partially exist)
+----------------------------------------------------------------
+1) sql/ddl_ar_ap.sql
+   - Non-destructive DDL with CREATE TABLE IF NOT EXISTS and safe indexes.
+   - Tables:
+     a) dim_ledger(ledger_id PK TEXT, ledger_name, ledger_group, gstin, city, pincode, updated_at)
+     b) fact_billwise_ref(PK (ledger_id, ref_name), ref_type, voucher_date, due_date, original_amount, pending_amount, last_adjusted_on, last_seen_at)
+     c) fact_payment(payment_id PK, ledger_id FK, date, amount, mode, ref_no, created_at)  -- only if you don’t already have it
+     d) etl_checkpoints(stream_name PK, last_date)
+     e) etl_runs(id, stream_name, started_at, finished_at, status, rows_loaded, error)
+   - Two plpgsql helper upsert functions:
+     • upsert_dim_ledger(...)
+     • upsert_billwise(...)
+   - Use NUMERIC(14,2) for amounts, DATE for dates, TIMESTAMPTZ for audit columns.
+   - Add appropriate indexes (ledger_id, date; partial index on pending_amount IS NOT NULL).
 
-```sql
--- Fact lines table (create if missing)
-create table if not exists fact_invoice_line (
-  invoice_line_id bigserial primary key,
-  invoice_id      bigint not null references fact_invoice(invoice_id) on delete cascade,
-  sku_id          bigint,              -- nullable: resolve by dim_sku if available
-  sku_name        text,                -- denormalized item name as seen on voucher
-  qty             numeric(14,3),
-  uom             text,
-  rate            numeric(14,2),
-  discount        numeric(14,2),
-  line_basic      numeric(14,2),       -- pre-tax (as emitted by InventoryEntries.Amount)
-  line_tax        numeric(14,2),       -- allocated or direct if provided
-  line_total      numeric(14,2),       -- basic + tax
-  created_at      timestamptz default now()
-);
+2) adapters/tally_http/ar_ap/requests/*.xml.j2  (Jinja templates)
+   - ledgers.xml.j2 → “List of Accounts” export with <SVCURRENTCOMPANY>.
+   - outstanding_receivables.xml.j2 → “Outstanding Receivables” with EXPLODEFLAG=Yes and date window.
+   - outstanding_payables.xml.j2 → “Outstanding Payables” with EXPLODEFLAG=Yes and date window.
+   - billwise_ledger.xml.j2 → “Ledger Outstandings” for a single ledger (EXPLODEFLAG=Yes; used for future deep-dives).
 
-create index if not exists idx_fil_invoice on fact_invoice_line (invoice_id);
-create index if not exists idx_fil_sku on fact_invoice_line (sku_id);
+3) adapters/tally_http/ar_ap/adapter.py
+   - Class TallyARAPAdapter(TallyConfig):
+     • fetch_ledgers_xml()
+     • fetch_outstanding_receivables_xml(from_date, to_date)
+     • fetch_outstanding_payables_xml(from_date, to_date)
+     • fetch_billwise_for_ledger_xml(ledger_name, from_date, to_date)
+   - Reuse existing HTTP client approach if already present (e.g., an existing TallyAdapter). 
+     If an adapter exists, create a thin wrapper that calls it; otherwise implement a small POST client (requests) consistent with repo style.
+   - Dates formatted as %d-%b-%Y (“01-Apr-2025”).
 
--- Lightweight staging (only if you don’t already stage lines)
-create table if not exists stg_vreg_header (
-  guid text,
-  vch_no text,
-  vch_date date,
-  party text,
-  basic_amount numeric(14,2),
-  tax_amount numeric(14,2),
-  total_amount numeric(14,2)
-);
+4) adapters/tally_http/ar_ap/parser.py
+   - Use lxml (or existing XML utility) to parse:
+     • parse_ledgers(xml_text) → [{ledger_id, ledger_name, ledger_group, gstin, city, pincode}]
+     • parse_outstanding_rows(xml_text) → robustly extract bill-wise rows with keys:
+         ledger_id (use ledger name as key),
+         ref_name, ref_type, voucher_date, due_date,
+         original_amount, pending_amount
+   - Implement BOTH code paths:
+     a) When data appears under <BILLALLOCATIONS.LIST> nodes
+     b) Fallback tabular rows under <LINE> (map common column names: LEDGERNAME, BILLREF, BILLTYPE, ORIGINALAMT, PENDINGAMT, BILLDATE, DUEDATE)
+   - Defensive parsing: default zeros, strip commas, handle missing tags.
 
-create table if not exists stg_vreg_line (
-  voucher_guid text,
-  stock_item_name text,
-  billed_qty text,        -- e.g., "2 Nos"
-  rate text,              -- e.g., "35000 / Nos"
-  amount numeric(14,2),   -- line basic (pre-tax), as in your current parse
-  discount numeric(14,2)  -- if present in your current parse; else null
-);
-````
+5) agent/etl_ar_ap/loader.py
+   - run_ar_ap_pipeline(db_url, tally_url, tally_company, from_dt, to_dt)
+     Steps:
+      a) Ensure DDL from sql/ddl_ar_ap.sql (use repo’s DB execution style)
+      b) Fetch & upsert ledgers
+      c) Fetch & upsert Outstanding Receivables
+      d) Fetch & upsert Outstanding Payables
+      e) Insert an etl_runs row per stream with status and rows_loaded; capture errors
+   - Upsert functions call the two SQL functions created in DDL.
+   - Respect existing logging pattern.
+   - Keep transactions small enough to avoid long-running locks (autocommit or small batches).
+   - Idempotent by design; safe to re-run for overlapping date windows.
 
-### 2) etl/sales_lines_from_vreg.py
+6) run_ar_ap.py (standalone entrypoint)
+   - Reuse repo’s config/env style (do NOT invent a new one).
+   - Required env: DB_URL, TALLY_URL, TALLY_COMPANY
+   - Optional: FROM_DT, TO_DT (YYYY-MM-DD). If absent, default FY-start..today (FY = Apr-Mar for India).
+   - Log start/end and the chosen date window; call run_ar_ap_pipeline().
 
-Implement a module that:
+7) tasks_ar_ap.sh (helper script)
+   - Small bash script with targets:
+     • ddl: psql "$DB_URL" -f sql/ddl_ar_ap.sql
+     • pull: python -m run_ar_ap.py
+   - Shebang + set -euo pipefail
 
-* Imports/uses the **same** Voucher Register fetcher you already have (e.g., a function/class you call today).
-* Hooks into the parsed object where you currently read: voucher.GUID, voucher.Date, voucher.VoucherNumber, voucher.PartyLedgerName, voucher.InventoryEntries (each with StockItemName, BilledQty, Rate, Amount, Discount if any), and voucher GST ledger totals (CGST/SGST/IGST) that your code already aggregates for header amounts.
-* Supports:
+----------------------------------------------------------------
+INTEGRATION RULES
+----------------------------------------------------------------
+- If your repo already defines:
+  • A Postgres connection factory → use it instead of psycopg.connect.
+  • A logger → import and use it.
+  • A Tally adapter → wrap/extend it; do not duplicate core HTTP code.
+- If paths differ (e.g., src/ instead of root), place files accordingly and fix imports.
+- All code must pass mypy/ruff (if the repo uses them). Prefer type hints.
+- Keep function names stable and clean; short, action verbs; snake_case.
 
-  * `--lookback-days N` or `--from YYYY-MM-DD --to YYYY-MM-DD` (mirror your existing CLI)
-  * `--dry-run`
-  * `--preview N`
-* Flow:
+----------------------------------------------------------------
+ACCEPTANCE CRITERIA
+----------------------------------------------------------------
+1) “Pull” run completes without error against a reachable Tally instance:
+   - Ledgers upserted into dim_ledger
+   - Receivables & payables bill-wise rows upserted into fact_billwise_ref
+   - etl_runs captures status and row counts
 
-  1. **Run migration** `0003_fact_invoice_line.sql` if not yet applied.
-  2. **Fetch vouchers** using the SAME function you use now (do not change request XML).
-  3. **Stage** rows: truncate `stg_vreg_header` + `stg_vreg_line`, insert headers & lines parsed from your existing structures.
-  4. **Upsert headers** into `fact_invoice` the same way you already do (or skip if you’re already doing it earlier in the pipeline).
-  5. **Delete + insert lines per voucher**:
+2) DDL is re-runnable (idempotent) and never drops or renames existing columns.
 
-     * Find `invoice_id` by joining staged headers to `fact_invoice` on `(vch_no, vch_date)` or GUID (whichever your system uses).
-     * Delete existing `fact_invoice_line` for those `invoice_id`s.
-     * Insert line rows with:
+3) Parser is robust against common Tally export variants (BILLALLOCATIONS and LINE forms).
 
-       * `sku_id` resolved by `dim_sku`:
+4) No changes to existing modules are necessary for the project to run; all new additions are opt-in.
 
-         * Preferred: by `guid` if your schema keeps it on dim_sku and your parser captures it.
-         * Else fallback: `lower(dim_sku.sku_name) = lower(stock_item_name)`.
-       * `qty` = numeric from `billed_qty` (regex on the numeric part).
-       * `uom` = unit token from `billed_qty` OR from `rate` (after slash) when present.
-       * `rate` = numeric part of `rate` before `/`.
-       * `line_basic` = staged `amount`.
-       * `line_tax` = proportional allocation from voucher tax, unless you already parse line tax (if you do, use your value).
-       * `line_total` = `line_basic + line_tax`.
-  6. **Preview**: print top N rows “who bought which SKU”.
+5) Provide clear docstrings and comments where non-obvious mapping is done.
 
-Parsing helpers (keep tiny):
+----------------------------------------------------------------
+CODE TO GENERATE
+----------------------------------------------------------------
+Generate the following files with full contents. 
+If any similar file already exists, MERGE conservatively: add missing parts, do not delete unrelated code. 
+For each file, include a short header comment explaining purpose and integration points.
 
-* `parse_qty_uom("2.00 Nos") -> (2.00, "Nos")`
-* `parse_rate("35000 / Nos") -> 35000`
-* If your current code already does these, REUSE those helpers instead of reimplementing.
+FILES:
+- sql/ddl_ar_ap.sql
+- adapters/tally_http/ar_ap/requests/ledgers.xml.j2
+- adapters/tally_http/ar_ap/requests/outstanding_receivables.xml.j2
+- adapters/tally_http/ar_ap/requests/outstanding_payables.xml.j2
+- adapters/tally_http/ar_ap/requests/billwise_ledger.xml.j2
+- adapters/tally_http/ar_ap/adapter.py
+- adapters/tally_http/ar_ap/parser.py
+- agent/etl_ar_ap/loader.py
+- run_ar_ap.py
+- tasks_ar_ap.sh (chmod +x)
 
-**SQL used by this module (parameterized via adapter):**
+Ensure imports resolve based on the current repo layout after you read adapter.py, run.py, and instructions.md. 
+If repository has a different namespace root (e.g., "intelayer"), adjust imports accordingly.
 
-Headers → (only if you need to upsert here; otherwise rely on your existing header loader)
-
-```sql
-insert into fact_invoice (vch_no, date, vchtype, customer_id, basic_amount, tax_amount, total)
-select vch_no, vch_date, 'Invoice',
-       coalesce(dc.customer_id, 0)::bigint,
-       basic_amount, tax_amount, total_amount
-from stg_vreg_header h
-left join dim_customer dc on lower(dc.name) = lower(h.party)
-on conflict (vch_no, date) do update
-  set basic_amount = excluded.basic_amount,
-      tax_amount   = excluded.tax_amount,
-      total        = excluded.total;
-```
-
-Delete & reinsert lines:
-
-```sql
-with inv as (
-  select fi.invoice_id, fi.vch_no, fi.date
-  from fact_invoice fi
-  join stg_vreg_header h on h.vch_no = fi.vch_no and h.vch_date = fi.date
-),
-line_src as (
-  select
-    i.invoice_id,
-    l.stock_item_name,
-    l.billed_qty,
-    l.rate,
-    l.amount as line_basic
-  from stg_vreg_line l
-  join stg_vreg_header h on h.guid = l.voucher_guid
-  join inv i on i.vch_no = h.vch_no and i.date = h.vch_date
-),
-sum_basic as (
-  select invoice_id, sum(line_basic) as sum_line_basic
-  from line_src group by 1
-),
-tax_alloc as (
-  select i.invoice_id, h.tax_amount as voucher_tax
-  from stg_vreg_header h
-  join inv i on i.vch_no = h.vch_no and i.date = h.vch_date
-)
-delete from fact_invoice_line fil
-using inv
-where fil.invoice_id = inv.invoice_id;
-
-insert into fact_invoice_line (
-  invoice_id, sku_id, sku_name, qty, uom, rate, discount, line_basic, line_tax, line_total
-)
-select
-  ls.invoice_id,
-  ds.sku_id,
-  ls.stock_item_name,
-  (regexp_matches(coalesce(ls.billed_qty,''), '([0-9.+-]+)[[:space:]]*([^/]*)'))[1]::numeric as qty,
-  nullif((regexp_matches(coalesce(ls.billed_qty,''), '([0-9.+-]+)[[:space:]]*([^/]*)'))[2], '') as uom,
-  nullif(regexp_replace(coalesce(ls.rate,''), '[/].*$', ''), '')::numeric as rate,
-  null::numeric as discount,  -- set from your parser if available
-  ls.line_basic,
-  round(coalesce((ls.line_basic / nullif(sb.sum_line_basic,0)) * coalesce(ta.voucher_tax,0),0),2) as line_tax,
-  round(ls.line_basic + coalesce((ls.line_basic / nullif(sb.sum_line_basic,0)) * coalesce(ta.voucher_tax,0),0),2) as line_total
-from line_src ls
-left join sum_basic sb on sb.invoice_id = ls.invoice_id
-left join tax_alloc ta on ta.invoice_id = ls.invoice_id
-left join dim_sku ds on lower(ds.sku_name) = lower(ls.stock_item_name);
-```
-
-**Preview query (print in the tool when `--preview` is set):**
-
-```sql
-select
-  fi.date, fi.vch_no,
-  dc.name as customer,
-  fil.sku_name, fil.qty, fil.uom, fil.rate,
-  fil.line_basic, fil.line_tax, fil.line_total
-from fact_invoice fi
-join fact_invoice_line fil on fil.invoice_id = fi.invoice_id
-left join dim_customer dc on dc.customer_id = fi.customer_id
-order by fi.date desc, fi.vch_no
-limit %s;
-```
-
-### 3) run.py
-
-Add a subcommand **without** modifying existing ones:
-
-* `python run.py sales-lines-from-vreg --lookback-days 7 --dry-run --preview 25`
-* `python run.py sales-lines-from-vreg --from 2025-04-01 --to 2025-10-15 --preview 50`
-
-Behavior:
-
-* Uses the same company/date-range options you already support for Voucher Register.
-* If `--dry-run`: do fetch+parse+stage in memory and show the preview; skip DB writes.
-
-## Validation & interim checks (print at end)
-
-* Headers seen / staged; Lines staged; Invoices affected.
-* Inserted/Updated header counts (if you upserted here).
-* Lines inserted.
-* `unmatched_skus_by_name` (count & sample of item names not found in dim_sku).
-* `unmatched_customers` (if any).
-* Reminder that we can switch to GUID-based SKU resolution later (if your current parse doesn’t carry item GUID).
-
-## Notes
-
-* Many Voucher Register exports emit `InventoryEntries.Amount` as **pre-tax**; your header tax is from GST ledgers. The proportional allocation above is the safest default. If your parser already extracts **line-level GST**, prefer those values and skip allocation.
-* Returns/Credit Notes: if your Voucher Register includes them, add a `where vch_type = 'Sales'` filter in your existing fetch or exclude negatives when inserting lines (leave as you already do for headers).
-* Performance: for large windows, chunk by 7 days; your existing runner likely already does this—reuse it.
-
-Build all of the above now. Keep code small, plug into existing fetch/parsing path, and DO NOT change the request envelope or header ingestion that already works.
-
-```
-
----
-
-Run it like this to test without writing:
-
-```
-
-python run.py sales-lines-from-vreg --lookback-days 7 --dry-run --preview 20
-
-```
-
-Then run it “for real” (drop `--dry-run`) and share the preview/summary if you want me to sanity-check the results.
-```
+Finally, print a brief RUNBOOK section in the console with:
+- Required env vars
+- Example commands to run DDL and pull
+- Where to find output tables and run logs

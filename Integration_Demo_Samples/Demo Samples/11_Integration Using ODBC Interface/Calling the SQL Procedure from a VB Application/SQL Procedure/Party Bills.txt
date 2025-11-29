@@ -1,0 +1,29 @@
+
+
+
+[Collection : _PartyBills]
+
+
+    Type      : Bills
+    Child of  : #UName
+    SQLParms  : UName    
+
+    SQLValues : Bill No 		: $Name
+    SQLValues : Bill Date 		: $$String:$BillDate:UniversalDate
+    SQLValues : Ledger Name		: #UName
+    SQLValues : Pending Amount	: $$String:$ClosingBalance
+    SQLValues : Voucher Type	: $$FullList:LedgerEntries:$CurLangVoucherTypeName
+    SQLValues : Voucher Number	: $$FullList:LedgerEntries:$VoucherNumber
+    SQLValues : Voucher Amount	: $$FullList:LedgerEntries:$$AllocBillsTotal
+    SQLValues : ItemDetails    		 : $$FullList:LedgerEntries:@@SILedDetails
+   
+
+
+
+[Variable : UName]
+
+  Type    	: String
+
+[System   : Variable]
+
+  UName 	: "Debtor 1"

@@ -1,0 +1,44 @@
+<ENVELOPE>
+    <HEADER>
+        <VERSION>1</VERSION>
+        <TALLYREQUEST>Export</TALLYREQUEST>
+        <TYPE>Data</TYPE>
+        <ID>MyReportGodowns</ID>
+    </HEADER>
+    <BODY>
+        <DESC>
+            <STATICVARIABLES>
+                <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
+                <SVCURRENTCOMPANY>{{ company }}</SVCURRENTCOMPANY>
+            </STATICVARIABLES>
+            <TDL>
+                <TDLMESSAGE>
+                    <REPORT NAME="MyReportGodowns">
+                        <FORMS>MyFormGodowns</FORMS>
+                    </REPORT>
+                    <FORM NAME="MyFormGodowns">
+                        <PARTS>MyPartGodowns</PARTS>
+                    </FORM>
+                    <PART NAME="MyPartGodowns">
+                        <LINES>MyLineGodowns</LINES>
+                        <REPEAT>MyLineGodowns : MyCollGodowns</REPEAT>
+                        <SCROLLED>Vertical</SCROLLED>
+                    </PART>
+                    <LINE NAME="MyLineGodowns">
+                        <FIELDS>FldName, FldGUID, FldParent, FldAlterId, FldAddress, FldIsInternal, FldHasNoSpace</FIELDS>
+                    </LINE>
+                    <FIELD NAME="FldName"><SET>$Name</SET><XMLTAG>NAME</XMLTAG></FIELD>
+                    <FIELD NAME="FldGUID"><SET>$GUID</SET><XMLTAG>GUID</XMLTAG></FIELD>
+                    <FIELD NAME="FldParent"><SET>$Parent</SET><XMLTAG>PARENT</XMLTAG></FIELD>
+                    <FIELD NAME="FldAlterId"><SET>if $$IsEmpty:$AlterId then "0" else $$String:$AlterId</SET><XMLTAG>ALTERID</XMLTAG></FIELD>
+                    <FIELD NAME="FldAddress"><SET>$Address</SET><XMLTAG>ADDRESS</XMLTAG></FIELD>
+                    <FIELD NAME="FldIsInternal"><SET>if $IsInternal then "Yes" else "No"</SET><XMLTAG>ISINTERNAL</XMLTAG></FIELD>
+                    <FIELD NAME="FldHasNoSpace"><SET>if $HasNoSpace then "Yes" else "No"</SET><XMLTAG>HASNOSPACE</XMLTAG></FIELD>
+                    <COLLECTION NAME="MyCollGodowns">
+                        <TYPE>Godown</TYPE>
+                    </COLLECTION>
+                </TDLMESSAGE>
+            </TDL>
+        </DESC>
+    </BODY>
+</ENVELOPE>

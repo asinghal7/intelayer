@@ -1,0 +1,25 @@
+<ENVELOPE>
+	<HEADER>
+		<VERSION>1</VERSION>
+		<STATUS>1</STATUS>
+	</HEADER>
+	<BODY>
+		<DATA>
+
+			<CUSTOMER>
+				<NAME>Kavita</NAME> 
+				<EMPID>99</EMPID>
+				<PHONE>
+					<OFFICENO>080-66282559</OFFICENO> 
+					<HOMENO>011-22222222</HOMENO>
+					<MOBILE>990201234</MOBILE>
+				</PHONE>
+				<ADDRESS>
+					<ADDRLINE>C/o. Info Solutions</ADDRLINE> 
+					<ADDRLINE>Technology Street</ADDRLINE>
+					<ADDRLINE>Tech Info Park</ADDRLINE>
+				</ADDRESS>
+			</CUSTOMER>
+		</DATA>
+	</BODY>
+</ENVELOPE>

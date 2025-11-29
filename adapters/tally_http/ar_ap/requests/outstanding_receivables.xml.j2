@@ -1,0 +1,36 @@
+<ENVELOPE>
+  <HEADER>
+    <VERSION>1</VERSION>
+    <TALLYREQUEST>Export</TALLYREQUEST>
+    <TYPE>Data</TYPE>
+    <ID>Outstanding Receivables</ID>
+  </HEADER>
+  <BODY>
+    <DESC>
+      <STATICVARIABLES>
+        <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
+        <SVCURRENTCOMPANY>{{company}}</SVCURRENTCOMPANY>
+        <SVFROMDATE>{{from_date}}</SVFROMDATE>
+        <SVTODATE>{{to_date}}</SVTODATE>
+        <EXPLODEFLAG>Yes</EXPLODEFLAG>
+      </STATICVARIABLES>
+      <TDL>
+        <TDLMESSAGE>
+          <COLLECTION NAME="Outstanding Receivables">
+            <TYPE>Ledger</TYPE>
+            <FETCH>Parent</FETCH>
+            <FILTER>OnlyDebtors</FILTER>
+            <FETCH>BillAllocations.*</FETCH>
+          </COLLECTION>
+          
+          <SYSTEM TYPE="Formulae" NAME="OnlyDebtors">
+            <FORMULA>$$IsDeemedPositive:$ClosingBalance</FORMULA>
+          </SYSTEM>
+        </TDLMESSAGE>
+      </TDL>
+    </DESC>
+  </BODY>
+</ENVELOPE>
+
+
+

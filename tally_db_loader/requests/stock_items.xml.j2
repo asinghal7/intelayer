@@ -1,0 +1,54 @@
+<ENVELOPE>
+    <HEADER>
+        <VERSION>1</VERSION>
+        <TALLYREQUEST>Export</TALLYREQUEST>
+        <TYPE>Data</TYPE>
+        <ID>MyReportStockItems</ID>
+    </HEADER>
+    <BODY>
+        <DESC>
+            <STATICVARIABLES>
+                <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
+                <SVCURRENTCOMPANY>{{ company }}</SVCURRENTCOMPANY>
+            </STATICVARIABLES>
+            <TDL>
+                <TDLMESSAGE>
+                    <REPORT NAME="MyReportStockItems">
+                        <FORMS>MyFormStockItems</FORMS>
+                    </REPORT>
+                    <FORM NAME="MyFormStockItems">
+                        <PARTS>MyPartStockItems</PARTS>
+                    </FORM>
+                    <PART NAME="MyPartStockItems">
+                        <LINES>MyLineStockItems</LINES>
+                        <REPEAT>MyLineStockItems : MyCollStockItems</REPEAT>
+                        <SCROLLED>Vertical</SCROLLED>
+                    </PART>
+                    <LINE NAME="MyLineStockItems">
+                        <FIELDS>FldName, FldGUID, FldParent, FldCategory, FldAlterId, FldBaseUnits, FldPartNo, FldHSNCode, FldDescription, FldOpeningBalance, FldOpeningValue, FldOpeningRate, FldClosingBalance, FldClosingValue, FldClosingRate, FldIsBatchWiseOn, FldCostingMethod</FIELDS>
+                    </LINE>
+                    <FIELD NAME="FldName"><SET>$Name</SET><XMLTAG>NAME</XMLTAG></FIELD>
+                    <FIELD NAME="FldGUID"><SET>$GUID</SET><XMLTAG>GUID</XMLTAG></FIELD>
+                    <FIELD NAME="FldParent"><SET>$Parent</SET><XMLTAG>PARENT</XMLTAG></FIELD>
+                    <FIELD NAME="FldCategory"><SET>$Category</SET><XMLTAG>CATEGORY</XMLTAG></FIELD>
+                    <FIELD NAME="FldAlterId"><SET>if $$IsEmpty:$AlterId then "0" else $$String:$AlterId</SET><XMLTAG>ALTERID</XMLTAG></FIELD>
+                    <FIELD NAME="FldBaseUnits"><SET>$BaseUnits</SET><XMLTAG>BASEUNITS</XMLTAG></FIELD>
+                    <FIELD NAME="FldPartNo"><SET>$PartNo</SET><XMLTAG>PARTNUMBER</XMLTAG></FIELD>
+                    <FIELD NAME="FldHSNCode"><SET>$GSTClassificationCode</SET><XMLTAG>HSNCODE</XMLTAG></FIELD>
+                    <FIELD NAME="FldDescription"><SET>$Description</SET><XMLTAG>DESCRIPTION</XMLTAG></FIELD>
+                    <FIELD NAME="FldOpeningBalance"><SET>$$StringFindAndReplace:(if $$IsInwards:$OpeningBalance then $$Number:$$String:$OpeningBalance:"TailUnits" else -$$Number:$$String:$OpeningBalance:"TailUnits"):"(-)":"-"</SET><XMLTAG>OPENINGBALANCE</XMLTAG></FIELD>
+                    <FIELD NAME="FldOpeningValue"><SET>$$NumValue:$OpeningValue</SET><XMLTAG>OPENINGVALUE</XMLTAG></FIELD>
+                    <FIELD NAME="FldOpeningRate"><SET>$$NumValue:$OpeningRate</SET><XMLTAG>OPENINGRATE</XMLTAG></FIELD>
+                    <FIELD NAME="FldClosingBalance"><SET>$$StringFindAndReplace:(if $$IsInwards:$ClosingBalance then $$Number:$$String:$ClosingBalance:"TailUnits" else -$$Number:$$String:$ClosingBalance:"TailUnits"):"(-)":"-"</SET><XMLTAG>CLOSINGBALANCE</XMLTAG></FIELD>
+                    <FIELD NAME="FldClosingValue"><SET>$$NumValue:$ClosingValue</SET><XMLTAG>CLOSINGVALUE</XMLTAG></FIELD>
+                    <FIELD NAME="FldClosingRate"><SET>$$NumValue:$ClosingRate</SET><XMLTAG>CLOSINGRATE</XMLTAG></FIELD>
+                    <FIELD NAME="FldIsBatchWiseOn"><SET>if $IsBatchWiseOn then "Yes" else "No"</SET><XMLTAG>ISBATCHWISEON</XMLTAG></FIELD>
+                    <FIELD NAME="FldCostingMethod"><SET>$CostingMethod</SET><XMLTAG>COSTINGMETHOD</XMLTAG></FIELD>
+                    <COLLECTION NAME="MyCollStockItems">
+                        <TYPE>StockItem</TYPE>
+                    </COLLECTION>
+                </TDLMESSAGE>
+            </TDL>
+        </DESC>
+    </BODY>
+</ENVELOPE>

@@ -1,0 +1,43 @@
+<ENVELOPE>
+    <HEADER>
+        <VERSION>1</VERSION>
+        <TALLYREQUEST>Export</TALLYREQUEST>
+        <TYPE>Data</TYPE>
+        <ID>MyReportClosingStock</ID>
+    </HEADER>
+    <BODY>
+        <DESC>
+            <STATICVARIABLES>
+                <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
+                <SVCURRENTCOMPANY>{{ company }}</SVCURRENTCOMPANY>
+                <SVFROMDATE TYPE="Date">{{ from_date }}</SVFROMDATE>
+                <SVTODATE TYPE="Date">{{ to_date }}</SVTODATE>
+            </STATICVARIABLES>
+            <TDL>
+                <TDLMESSAGE>
+                    <REPORT NAME="MyReportClosingStock">
+                        <FORMS>MyFormClosingStock</FORMS>
+                    </REPORT>
+                    <FORM NAME="MyFormClosingStock">
+                        <PARTS>MyPartClosingStock</PARTS>
+                    </FORM>
+                    <PART NAME="MyPartClosingStock">
+                        <LINES>MyLineClosingStock</LINES>
+                        <REPEAT>MyLineClosingStock : MyCollClosingStock</REPEAT>
+                        <SCROLLED>Vertical</SCROLLED>
+                    </PART>
+                    <LINE NAME="MyLineClosingStock">
+                        <FIELDS>FldName, FldClosingBalance, FldClosingValue, FldClosingRate</FIELDS>
+                    </LINE>
+                    <FIELD NAME="FldName"><SET>$Name</SET><XMLTAG>NAME</XMLTAG></FIELD>
+                    <FIELD NAME="FldClosingBalance"><SET>$$StringFindAndReplace:(if $$IsInwards:$ClosingBalance then $$Number:$$String:$ClosingBalance:"TailUnits" else -$$Number:$$String:$ClosingBalance:"TailUnits"):"(-)":"-"</SET><XMLTAG>CLOSINGBALANCE</XMLTAG></FIELD>
+                    <FIELD NAME="FldClosingValue"><SET>$$NumValue:$ClosingValue</SET><XMLTAG>CLOSINGVALUE</XMLTAG></FIELD>
+                    <FIELD NAME="FldClosingRate"><SET>$$NumValue:$ClosingRate</SET><XMLTAG>CLOSINGRATE</XMLTAG></FIELD>
+                    <COLLECTION NAME="MyCollClosingStock">
+                        <TYPE>StockItem</TYPE>
+                    </COLLECTION>
+                </TDLMESSAGE>
+            </TDL>
+        </DESC>
+    </BODY>
+</ENVELOPE>

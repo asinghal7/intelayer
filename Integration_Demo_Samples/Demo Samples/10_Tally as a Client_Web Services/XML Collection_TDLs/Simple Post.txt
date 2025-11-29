@@ -1,0 +1,89 @@
+;; Sri Ganeshji : Sri Balaji : Sri Pitreshwarji : Sri Durgaji : Sri Venkateshwara
+
+/*
+
+Post Request and Get Response from Remote URL:
+
+This program demonstrates the capability of XML Collection to post data from Tally to a Predefined URL
+and retrieve the response XML in Collection
+
+Further it displays the data fetched in a Report 
+
+*/
+
+;;Report Displaying XML response fetched 
+
+[Report: XML Post Collection]
+
+	Form 	: XML Post Collection
+	Title 	: "Simple Post Request"
+
+[Form: XML Post Collection]
+
+	Parts		: XML Post Collection
+	Bottom Parts: XML Code
+	Height		: 100% Screen
+	Width		: 100% Screen
+
+[Part: XML Post Collection]
+
+	Lines	: XML Post Collection
+	Repeat	: XML Post Collection	: XML Post Collection	
+	Scroll  : Vertical
+	Width 	: 100% Screen
+
+	[Line: XML Post Collection]
+
+		Fields	: XML Name, XMLEmp ID
+		Explode : XML Phone
+		Explode : XML Add
+
+[Part: XML Code]
+
+	Parts 	: XML Request, XML Data 
+	Width 	: 100% Screen
+	Local 	: Line	: XML Data	: Local	: Field 	: XML Data	: Set As 	: "XML Response from the Remote Server"
+	Local 	: Line	: XML Request3	: Local	: Field		: XML Request 	: Set As 	: "<NAME>Tally</NAME>"
+	Local 	: Line	: XML Request4	: Local	: Field		: XML Request 	: Set As 	: "<EMPID>00000</EMPID>"
+	Local 	: Line	: XML Data2	: Local	: Field		: XML Data	: Set As 	: "<NAME>Tally</NAME>"
+	Local 	: Line	: XML Data3	: Local	: Field		: XML Data	: Set As 	: "<EMPID>00000</EMPID>"
+
+
+;;Collection retrieving XML response from a predefined URL 
+
+[Collection: XML Post Collection]
+
+	Remote URL		: "http://192.168.2.108/CXMLResponse.php" ;;URL Specification
+	RemoteRequest  	: XMLPostReqRep : ASCII               ;;Post Request Specification
+
+;;Report for Post Request 
+
+[Report: XMLPostReqRep]
+
+	Form  	: XMLPostReqRep
+	
+[Form: XMLPostReqRep]
+
+    Parts 	: XMLPostReqRep
+ 
+[Part: XMLPostReqRep]
+
+    Lines		: XMLPostReqRep
+	Scroll		: Vertical
+	XML Tag 	: "REQUEST"
+
+	[Line: XMLPostReqRep]
+
+		Fields 		: XMLPostReqRepName, XMLPostReqRepPwd
+
+      	[Field: XMLPostReqRepName]
+
+        	Set As 	 	: "Tally"
+			XML Tag	 	: "NAME"
+
+		[Field: XMLPostReqRepPwd]
+
+   		    Set As   	: "00000"
+          	XML Tag 	: "EMPID"
+
+;; End-of-File

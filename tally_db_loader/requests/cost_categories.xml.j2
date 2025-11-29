@@ -1,0 +1,42 @@
+<ENVELOPE>
+    <HEADER>
+        <VERSION>1</VERSION>
+        <TALLYREQUEST>Export</TALLYREQUEST>
+        <TYPE>Data</TYPE>
+        <ID>MyReportCostCategories</ID>
+    </HEADER>
+    <BODY>
+        <DESC>
+            <STATICVARIABLES>
+                <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
+                <SVCURRENTCOMPANY>{{ company }}</SVCURRENTCOMPANY>
+            </STATICVARIABLES>
+            <TDL>
+                <TDLMESSAGE>
+                    <REPORT NAME="MyReportCostCategories">
+                        <FORMS>MyFormCostCategories</FORMS>
+                    </REPORT>
+                    <FORM NAME="MyFormCostCategories">
+                        <PARTS>MyPartCostCategories</PARTS>
+                    </FORM>
+                    <PART NAME="MyPartCostCategories">
+                        <LINES>MyLineCostCategories</LINES>
+                        <REPEAT>MyLineCostCategories : MyCollCostCategories</REPEAT>
+                        <SCROLLED>Vertical</SCROLLED>
+                    </PART>
+                    <LINE NAME="MyLineCostCategories">
+                        <FIELDS>FldName, FldGUID, FldAlterId, FldAllocateRevenue, FldAllocateNonRevenue</FIELDS>
+                    </LINE>
+                    <FIELD NAME="FldName"><SET>$Name</SET><XMLTAG>NAME</XMLTAG></FIELD>
+                    <FIELD NAME="FldGUID"><SET>$GUID</SET><XMLTAG>GUID</XMLTAG></FIELD>
+                    <FIELD NAME="FldAlterId"><SET>if $$IsEmpty:$AlterId then "0" else $$String:$AlterId</SET><XMLTAG>ALTERID</XMLTAG></FIELD>
+                    <FIELD NAME="FldAllocateRevenue"><SET>if $AllocateRevenue then "Yes" else "No"</SET><XMLTAG>ALLOCATEREVENUE</XMLTAG></FIELD>
+                    <FIELD NAME="FldAllocateNonRevenue"><SET>if $AllocateNonRevenue then "Yes" else "No"</SET><XMLTAG>ALLOCATENONREVENUE</XMLTAG></FIELD>
+                    <COLLECTION NAME="MyCollCostCategories">
+                        <TYPE>CostCategory</TYPE>
+                    </COLLECTION>
+                </TDLMESSAGE>
+            </TDL>
+        </DESC>
+    </BODY>
+</ENVELOPE>

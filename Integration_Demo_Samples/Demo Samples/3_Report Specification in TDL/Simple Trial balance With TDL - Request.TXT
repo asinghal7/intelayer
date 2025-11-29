@@ -1,0 +1,61 @@
+<ENVELOPE>
+ 	<HEADER>
+    		<VERSION>1</VERSION>
+    		<TALLYREQUEST>Export</TALLYREQUEST>
+    		<TYPE>Data</TYPE>
+    		<ID>Simple Trial balance</ID>
+ 	</HEADER>
+ 	<BODY>
+ 		<DESC>
+      			<STATICVARIABLES>
+       		    		<EXPLODEFLAG>Yes</EXPLODEFLAG>
+       		    		<SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
+   		  	</STATICVARIABLES>
+	<TDL>
+ <TDLMESSAGE>
+ <REPORT NAME="Simple Trial balance" ISMODIFY="No" ISFIXED="No" ISINITIALIZE="No" ISOPTION="No" ISINTERNAL="No">
+  <FORMS>Simple Trial balance</FORMS> 
+  <TITLE>"Trial Balance"</TITLE> 
+  </REPORT>
+ <FORM NAME="Simple Trial balance" ISMODIFY="No" ISFIXED="No" ISINITIALIZE="No" ISOPTION="No" ISINTERNAL="No">
+  <TOPPARTS>Simple TB Part</TOPPARTS> 
+  <HEIGHT>100% Page</HEIGHT> 
+  <WIDTH>100% Page</WIDTH> 
+  </FORM>
+ <PART NAME="Simple TB Part" ISMODIFY="No" ISFIXED="No" ISINITIALIZE="No" ISOPTION="No" ISINTERNAL="No">
+  <TOPLINES>Simple TB Title, Simple TB Details</TOPLINES> 
+  <REPEAT>Simple TB Details : Simple TB Ledgers</REPEAT> 
+  <SCROLLED>Vertical</SCROLLED> 
+  <COMMONBORDERS>Yes</COMMONBORDERS> 
+  </PART>
+ <LINE NAME="Simple TB Title" ISMODIFY="No" ISFIXED="No" ISINITIALIZE="No" ISOPTION="No" ISINTERNAL="No">
+  <USE>Simple TB Details</USE> 
+  <LOCAL>Field : Default : Type : String</LOCAL> 
+  <LOCAL>Field : Default : Align : Centre</LOCAL> 
+  <LOCAL>Field : Simple TB Name Field : Set as: "Particulars"</LOCAL> 
+  <LOCAL>Field : Simple TB Amount Field: Set as: "Amount"</LOCAL> 
+  <BORDER>Flush Totals</BORDER> 
+  </LINE>
+ <LINE NAME="Simple TB Details" ISMODIFY="No" ISFIXED="No" ISINITIALIZE="No" ISOPTION="No" ISINTERNAL="No">
+  <LEFTFIELDS>Simple TB Name Field</LEFTFIELDS> 
+  <RIGHTFIELDS>Simple TB Amount Field</RIGHTFIELDS> 
+  </LINE>
+<FIELD NAME="Simple TB Name Field" ISMODIFY="No" ISFIXED="No" ISINITIALIZE="No" ISOPTION="No" ISINTERNAL="No">
+  <USE>Name Field</USE> 
+  <SET>$Name</SET> 
+  </FIELD>
+<FIELD NAME="Simple TB Amount Field" ISMODIFY="No" ISFIXED="No" ISINITIALIZE="No" ISOPTION="No" ISINTERNAL="No">
+  <USE>Amount Field</USE> 
+  <SET>$ClosingBalance</SET> 
+  <BORDER>Thin Left</BORDER> 
+  </FIELD>
+ <COLLECTION NAME="Simple TB Ledgers" ISMODIFY="No" ISFIXED="No" ISINITIALIZE="No" ISOPTION="No" ISINTERNAL="No">
+  <TYPE>Ledger</TYPE> 
+  <FILTERS>NoProfitsimple</FILTERS> 
+  </COLLECTION>
+  <SYSTEM TYPE="Formulae" NAME="NoProfitSimple" ISMODIFY="No" ISFIXED="No" ISINTERNAL="No">NOT $$IsLedgerProfit</SYSTEM> 
+  </TDLMESSAGE>
+  </TDL>
+ 	 	</DESC>
+ 	</BODY>
+</ENVELOPE>

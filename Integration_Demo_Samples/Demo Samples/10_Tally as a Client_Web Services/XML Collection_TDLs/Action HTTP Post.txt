@@ -1,0 +1,251 @@
+;; Sri Ganeshji : Sri Balaji : Sri Pitreshwarji : Sri Durgaji : Sri Venkateshwara
+
+/*
+
+HTTP POST Action :
+
+This program demonstrates the capability of using the Action HTTP POST to post data from Tally to a Predefined URL
+and retrieve the response XML in a predefined Collection "Parameter Collection".
+
+Further it displays the data fetched in a Report 
+
+*/
+
+
+
+;; Report executing the Action HTTP Post 
+
+[Report: HTTP Post Welcome]
+
+	Form 	: HTTP Post Welcome
+	Title 	: "Action HTTP POST"
+
+[Form: HTTP Post Welcome]
+
+	Parts	: HTTP Post Welcome
+	Button	: PostButton
+
+[Part: HTTP Post Welcome]
+
+	Lines	: HTTP Post Welcome, HTTP Post Welcome1
+
+	[Line: HTTP Post Welcome]
+
+		Fields	: HTTP Post Welcome
+
+		[Field: HTTP Post Welcome]
+
+			Set As 	: "Welcome"
+			Width 	: 70
+			Style 	: Normal Bold
+			Align 	: Centre
+
+	[Line: HTTP Post Welcome1]
+
+		Fields	: HTTP Post Welcome1
+
+		[Field: HTTP Post Welcome1]
+
+			Set As 	: "Please Click on the Post Button or Press Ctrl + K key"
+			Width 	: 70
+			Align 	: Centre
+
+;;Report Displaying XML response fetched 
+
+[Report: HTTP Post Response Report]
+
+	Form 		: HTTP Post  Report
+
+[Form: HTTP Post  Report]
+
+	Part		: HTTP Post Report
+	Bottom Parts: XML Code
+	Height		: 100% Screen
+	Width		: 100% Screen
+
+[Part: HTTP Post  Report]
+
+	Lines	: HTTP Post Report1
+	Repeat	: HTTP Post Report1 	: Parameter Collection
+	Scroll	: Vertical
+
+	[Line : HTTP Post Report1]
+		Field   : HTTP Post Report1
+		Explode : HTTP Post Report1
+
+		[Field : HTTP Post Report1]
+			Set As : "Body"
+
+[Part :HTTP Post Report1]
+	Line  : HTTP Post Report2
+	Repeat: HTTP Post Report2 :BODY
+
+	[Line : HTTP Post Report2]
+		Field :HTTP Post Report2
+		Explode :HTTP Post Report3
+
+		[Field : HTTP Post Report2]
+			Set As : "DATA"
+
+[Part :HTTP Post Report3]
+	Line  : HTTP Post Report3
+	Repeat: HTTP Post Report3 :DATA
+
+	[Line : HTTP Post Report3]
+		Field :HTTP Post Report3
+		Explode :HTTP Post Report4
+
+		[Field : HTTP Post Report3]
+			Set As : "CUSTOMER"
+		
+[Part :HTTP Post Report4]
+	Line  : HTTP Post Report
+	Repeat: HTTP Post Report :CUSTOMER
+
+	[Line: HTTP Post Report]
+
+		Fields	: HTTP Post Name, HTTP PostEmp ID
+		Explode : HTTP Post Phone
+		Explode : HTTP Post Add
+
+		[Field: HTTP PostName]
+
+			Set As 	: "Name : " +  $NAME
+							
+		[Field: HTTP PostEmp ID]
+
+			Set As 	: "Employee ID :" +  $EMPID
+		
+;; Explode Part - HTTP PostPhone
+
+[Part: HTTP PostPhone]
+
+	Lines	: HTTP PostCollPhone
+	Repeat 	: HTTP Post CollPhone 	: Phone
+	Scroll	: Vertical
+
+	[Line: HTTP Post CollPhone]
+
+		Fields	: Name Field, HTTP Post Office, HTTP Post Home, HTTP Post Mobile
+		Local 	: Field	: Name Field: Set As 	: "Phone No"
+			
+		[Field: HTTP Post Office]
+
+			Set As 	:  "Office:" + $OfficeNo	
+					
+		[Field: HTTP Post Home]
+
+			Set As 	: "Home :"  + $HomeNo
+					
+		[Field: HTTP Post Mobile]
+
+			Set As 	: "Mobile :" + $Mobile
+
+;; Explode Part - HTTP Post Add
+			
+[Part: HTTP Post Add]
+
+	Lines	: HTTP Post CollAdd
+	Repeat 	: HTTP PostCollAdd 	: Address
+	Scroll	: Vertical
+
+	[Line: HTTP Post CollAdd]
+
+		Fields	: HTTP PostAdd1
+		Explode : HTTP Post Addr Line
+
+		[Field: HTTP Post Add1]
+
+			Use 	: Name Field
+			Set As 	: "Address"
+
+;; Explode Part - HTTP Post Addr Line
+
+[Part: HTTP Post Addr Line]
+
+	Lines	: HTTP Post Addrline
+	Repeat 	: HTTP Post Addrline 	: AddrLine
+	Scroll	: Vertical
+
+	[Line: HTTP Post Addrline]
+
+		Fields	: HTTP Post Add2
+
+		[Field: HTTP PostAdd2]
+
+			Set As : $AddrLine
+			Indent : 5
+
+;;POST Request Report 
+
+[Report: HTTP Post ReqRep]
+
+	Form  	: HTTP PostReqRep
+
+[Form: HTTP PostReqRep]
+
+    Parts 	: HTTP PostReqRep
+	
+[Part: HTTP PostReqRep]
+
+    Lines   : HTTP PostReqRep
+	XML Tag	: "REQUEST"
+	Scroll 	: Vertical
+
+	[Line: HTTP PostReqRep]
+
+		Fields 	: HTTP PostReqRepName, HTTP PostReqRepPwd
+
+      	[Field: HTTP PostReqRepName]
+
+           	Set As 	 	: "TALLY"
+  		 	XML Tag	 	: "NAME"
+
+		[Field: HTTP PostReqRepPwd]
+
+		 	Set As  	: "00000"
+            XML Tag 	: "EMPID"
+
+
+;;Button using Action HTTP Post 
+
+[Button: PostButton]
+
+	Key 	: Ctrl+K
+	Action 	: HTTP Post : @@MyURL: ASCII: HTTP Post ReqRep : HTTP Post Response Report1  : HTTP Post Response Report
+;;	Scope   :
+
+[System: Formula]
+
+	MyURL	:  "http://192.168.2.108/CXMLResponse as per tally.php"
+
+
+;; Report to be displayed in case of error
+
+
+[Report :HTTP Post Response Report1]
+
+	Form  	: HTTP Post Response Report1
+
+[Form: HTTP Post Response Report1]
+
+    	Parts 	: HTTP Post Response Report1
+	
+[Part: HTTP Post Response Report1]
+
+    	Lines   : HTTP Post Response Report1
+	
+
+	[Line: HTTP Post Response Report1]
+
+		Fields 	: HTTP Post Response Report1
+
+      	[Field: HTTP Post Response Report1]
+
+           	Set As 	 	: "Not able to get data"
+
+
+;; End-of-File
+
+
+

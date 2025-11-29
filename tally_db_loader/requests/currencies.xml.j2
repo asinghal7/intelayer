@@ -1,0 +1,45 @@
+<ENVELOPE>
+    <HEADER>
+        <VERSION>1</VERSION>
+        <TALLYREQUEST>Export</TALLYREQUEST>
+        <TYPE>Data</TYPE>
+        <ID>MyReportCurrencies</ID>
+    </HEADER>
+    <BODY>
+        <DESC>
+            <STATICVARIABLES>
+                <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
+                <SVCURRENTCOMPANY>{{ company }}</SVCURRENTCOMPANY>
+            </STATICVARIABLES>
+            <TDL>
+                <TDLMESSAGE>
+                    <REPORT NAME="MyReportCurrencies">
+                        <FORMS>MyFormCurrencies</FORMS>
+                    </REPORT>
+                    <FORM NAME="MyFormCurrencies">
+                        <PARTS>MyPartCurrencies</PARTS>
+                    </FORM>
+                    <PART NAME="MyPartCurrencies">
+                        <LINES>MyLineCurrencies</LINES>
+                        <REPEAT>MyLineCurrencies : MyCollCurrencies</REPEAT>
+                        <SCROLLED>Vertical</SCROLLED>
+                    </PART>
+                    <LINE NAME="MyLineCurrencies">
+                        <FIELDS>FldName, FldGUID, FldAlterId, FldOriginalName, FldISOCode, FldFormalName, FldSymbol, FldDecimalPlaces</FIELDS>
+                    </LINE>
+                    <FIELD NAME="FldName"><SET>$Name</SET><XMLTAG>NAME</XMLTAG></FIELD>
+                    <FIELD NAME="FldGUID"><SET>$GUID</SET><XMLTAG>GUID</XMLTAG></FIELD>
+                    <FIELD NAME="FldAlterId"><SET>if $$IsEmpty:$AlterId then "0" else $$String:$AlterId</SET><XMLTAG>ALTERID</XMLTAG></FIELD>
+                    <FIELD NAME="FldOriginalName"><SET>$OriginalName</SET><XMLTAG>ORIGINALNAME</XMLTAG></FIELD>
+                    <FIELD NAME="FldISOCode"><SET>$ISOCode</SET><XMLTAG>ISOCODE</XMLTAG></FIELD>
+                    <FIELD NAME="FldFormalName"><SET>$FormalName</SET><XMLTAG>FORMALNAME</XMLTAG></FIELD>
+                    <FIELD NAME="FldSymbol"><SET>$Symbol</SET><XMLTAG>SYMBOL</XMLTAG></FIELD>
+                    <FIELD NAME="FldDecimalPlaces"><SET>if $$IsEmpty:$DecimalPlaces then "2" else $$String:$DecimalPlaces</SET><XMLTAG>DECIMALPLACES</XMLTAG></FIELD>
+                    <COLLECTION NAME="MyCollCurrencies">
+                        <TYPE>Currency</TYPE>
+                    </COLLECTION>
+                </TDLMESSAGE>
+            </TDL>
+        </DESC>
+    </BODY>
+</ENVELOPE>

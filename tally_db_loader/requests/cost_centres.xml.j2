@@ -1,0 +1,44 @@
+<ENVELOPE>
+    <HEADER>
+        <VERSION>1</VERSION>
+        <TALLYREQUEST>Export</TALLYREQUEST>
+        <TYPE>Data</TYPE>
+        <ID>MyReportCostCentres</ID>
+    </HEADER>
+    <BODY>
+        <DESC>
+            <STATICVARIABLES>
+                <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
+                <SVCURRENTCOMPANY>{{ company }}</SVCURRENTCOMPANY>
+            </STATICVARIABLES>
+            <TDL>
+                <TDLMESSAGE>
+                    <REPORT NAME="MyReportCostCentres">
+                        <FORMS>MyFormCostCentres</FORMS>
+                    </REPORT>
+                    <FORM NAME="MyFormCostCentres">
+                        <PARTS>MyPartCostCentres</PARTS>
+                    </FORM>
+                    <PART NAME="MyPartCostCentres">
+                        <LINES>MyLineCostCentres</LINES>
+                        <REPEAT>MyLineCostCentres : MyCollCostCentres</REPEAT>
+                        <SCROLLED>Vertical</SCROLLED>
+                    </PART>
+                    <LINE NAME="MyLineCostCentres">
+                        <FIELDS>FldName, FldGUID, FldParent, FldCategory, FldAlterId, FldIsRevenue, FldEmail</FIELDS>
+                    </LINE>
+                    <FIELD NAME="FldName"><SET>$Name</SET><XMLTAG>NAME</XMLTAG></FIELD>
+                    <FIELD NAME="FldGUID"><SET>$GUID</SET><XMLTAG>GUID</XMLTAG></FIELD>
+                    <FIELD NAME="FldParent"><SET>$Parent</SET><XMLTAG>PARENT</XMLTAG></FIELD>
+                    <FIELD NAME="FldCategory"><SET>$Category</SET><XMLTAG>CATEGORY</XMLTAG></FIELD>
+                    <FIELD NAME="FldAlterId"><SET>if $$IsEmpty:$AlterId then "0" else $$String:$AlterId</SET><XMLTAG>ALTERID</XMLTAG></FIELD>
+                    <FIELD NAME="FldIsRevenue"><SET>if $IsRevenue then "Yes" else "No"</SET><XMLTAG>ISREVENUE</XMLTAG></FIELD>
+                    <FIELD NAME="FldEmail"><SET>$Email</SET><XMLTAG>EMAIL</XMLTAG></FIELD>
+                    <COLLECTION NAME="MyCollCostCentres">
+                        <TYPE>CostCentre</TYPE>
+                    </COLLECTION>
+                </TDLMESSAGE>
+            </TDL>
+        </DESC>
+    </BODY>
+</ENVELOPE>

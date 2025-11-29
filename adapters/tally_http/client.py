@@ -17,7 +17,14 @@ class TallyClient:
 
     @retry(wait=wait_exponential(multiplier=1, min=1, max=30),
            stop=stop_after_attempt(5))
-    def post_xml(self, xml: str, timeout: int = 60) -> str:
+    def post_xml(self, xml: str, timeout: int = 300) -> str:
+        """
+        Post XML to Tally and return response.
+        
+        Args:
+            xml: XML request string
+            timeout: Request timeout in seconds (default 300 for large exports)
+        """
         r = self.session.post(self.base_url, data=xml.encode("utf-8"), timeout=timeout)
         r.raise_for_status()
         text = r.text

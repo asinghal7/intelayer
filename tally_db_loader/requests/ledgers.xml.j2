@@ -1,0 +1,56 @@
+<ENVELOPE>
+    <HEADER>
+        <VERSION>1</VERSION>
+        <TALLYREQUEST>Export</TALLYREQUEST>
+        <TYPE>Data</TYPE>
+        <ID>MyReportLedgers</ID>
+    </HEADER>
+    <BODY>
+        <DESC>
+            <STATICVARIABLES>
+                <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
+                <SVCURRENTCOMPANY>{{ company }}</SVCURRENTCOMPANY>
+            </STATICVARIABLES>
+            <TDL>
+                <TDLMESSAGE>
+                    <REPORT NAME="MyReportLedgers">
+                        <FORMS>MyFormLedgers</FORMS>
+                    </REPORT>
+                    <FORM NAME="MyFormLedgers">
+                        <PARTS>MyPartLedgers</PARTS>
+                    </FORM>
+                    <PART NAME="MyPartLedgers">
+                        <LINES>MyLineLedgers</LINES>
+                        <REPEAT>MyLineLedgers : MyCollLedgers</REPEAT>
+                        <SCROLLED>Vertical</SCROLLED>
+                    </PART>
+                    <LINE NAME="MyLineLedgers">
+                        <FIELDS>FldName, FldGUID, FldParent, FldAlterId, FldOpeningBalance, FldClosingBalance, FldGSTIN, FldPAN, FldAddress, FldPincode, FldState, FldCountry, FldEmail, FldPhone, FldContactPerson, FldCreditPeriod, FldCreditLimit, FldIsBillWiseOn, FldIsCostCentresOn</FIELDS>
+                    </LINE>
+                    <FIELD NAME="FldName"><SET>$Name</SET><XMLTAG>NAME</XMLTAG></FIELD>
+                    <FIELD NAME="FldGUID"><SET>$GUID</SET><XMLTAG>GUID</XMLTAG></FIELD>
+                    <FIELD NAME="FldParent"><SET>$Parent</SET><XMLTAG>PARENT</XMLTAG></FIELD>
+                    <FIELD NAME="FldAlterId"><SET>if $$IsEmpty:$AlterId then "0" else $$String:$AlterId</SET><XMLTAG>ALTERID</XMLTAG></FIELD>
+                    <FIELD NAME="FldOpeningBalance"><SET>$$StringFindAndReplace:(if $$IsDebit:$OpeningBalance then -$$NumValue:$OpeningBalance else $$NumValue:$OpeningBalance):"(-)":"-"</SET><XMLTAG>OPENINGBALANCE</XMLTAG></FIELD>
+                    <FIELD NAME="FldClosingBalance"><SET>$$StringFindAndReplace:(if $$IsDebit:$ClosingBalance then -$$NumValue:$ClosingBalance else $$NumValue:$ClosingBalance):"(-)":"-"</SET><XMLTAG>CLOSINGBALANCE</XMLTAG></FIELD>
+                    <FIELD NAME="FldGSTIN"><SET>$GSTIN</SET><XMLTAG>GSTIN</XMLTAG></FIELD>
+                    <FIELD NAME="FldPAN"><SET>$IncomeTaxNumber</SET><XMLTAG>PAN</XMLTAG></FIELD>
+                    <FIELD NAME="FldAddress"><SET>$Address</SET><XMLTAG>ADDRESS</XMLTAG></FIELD>
+                    <FIELD NAME="FldPincode"><SET>$PinCode</SET><XMLTAG>PINCODE</XMLTAG></FIELD>
+                    <FIELD NAME="FldState"><SET>$StateName</SET><XMLTAG>STATENAME</XMLTAG></FIELD>
+                    <FIELD NAME="FldCountry"><SET>$CountryName</SET><XMLTAG>COUNTRYNAME</XMLTAG></FIELD>
+                    <FIELD NAME="FldEmail"><SET>$Email</SET><XMLTAG>EMAIL</XMLTAG></FIELD>
+                    <FIELD NAME="FldPhone"><SET>$LedgerPhone</SET><XMLTAG>PHONE</XMLTAG></FIELD>
+                    <FIELD NAME="FldContactPerson"><SET>$LedgerContact</SET><XMLTAG>CONTACTPERSON</XMLTAG></FIELD>
+                    <FIELD NAME="FldCreditPeriod"><SET>if $$IsEmpty:$CreditPeriod then "0" else $$String:$CreditPeriod</SET><XMLTAG>CREDITPERIOD</XMLTAG></FIELD>
+                    <FIELD NAME="FldCreditLimit"><SET>$$NumValue:$CreditLimit</SET><XMLTAG>CREDITLIMIT</XMLTAG></FIELD>
+                    <FIELD NAME="FldIsBillWiseOn"><SET>if $IsBillWiseOn then "Yes" else "No"</SET><XMLTAG>ISBILLWISEON</XMLTAG></FIELD>
+                    <FIELD NAME="FldIsCostCentresOn"><SET>if $IsCostCentresOn then "Yes" else "No"</SET><XMLTAG>ISCOSTCENTRESON</XMLTAG></FIELD>
+                    <COLLECTION NAME="MyCollLedgers">
+                        <TYPE>Ledger</TYPE>
+                    </COLLECTION>
+                </TDLMESSAGE>
+            </TDL>
+        </DESC>
+    </BODY>
+</ENVELOPE>

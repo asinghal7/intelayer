@@ -1,0 +1,9 @@
+[Collection : _StkBatches]
+	Type 		: Batches
+	Childof 		: ##StkItemName
+	SQLParms 	: StkItemName
+	SQLValues 	: Name 	: $Name
+	SQLValues 	: Amount 	: $ClosingBalance
+
+[Variable: StkItemName]
+	Type	:  String

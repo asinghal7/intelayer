@@ -1,0 +1,372 @@
+**********************************************************************
+ Exporting Data from  Filename: C:\Documents and Settings\vivek.k\Desktop\vb\Datatrn.xlsto Tally: http://LOCALHOST:9090
+ Start Time: 06-Dec-2007 13:46:57
+**********************************************************************
+**********************************************************************
+ Line No.: 2  Name:    <RESPONSE>	Importing Data to company: 'Demo' 	<LINEERROR>   35: Stock Group 'Commercial' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 3  Name:    <RESPONSE>	Importing Data to company: 'Demo' 	<LINEERROR>   35: Stock Group 'Government' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 4  Name:    <RESPONSE>	Importing Data to company: 'Demo' 	<LINEERROR>   35: Stock Group 'Industrial' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 5  Name:    <RESPONSE>	Importing Data to company: 'Demo' 	<LINEERROR>   35: Stock Group 'Residential' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 6  Name:    <RESPONSE>	Importing Data to company: 'Demo' 	<LINEERROR>   35: Stock Group 'Commercial' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Process Completed with Errors (Count: 5)
+ Completion Time: 06-Dec-2007 13:47:02
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\Documents and Settings\vivek.k\Desktop\vb\Datatrn.xlsto Tally: http://LOCALHOST:9090
+ Start Time: 06-Dec-2007 13:48:00
+**********************************************************************
+**********************************************************************
+ Line No.: 2  Name:    <RESPONSE>	Importing Data to company: 'Demo' 	<LINEERROR>   24: Group 'Ward No 1' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 3  Name:    <RESPONSE>	Importing Data to company: 'Demo' 	<LINEERROR>   24: Group 'Ward No 1' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 4  Name:    <RESPONSE>	Importing Data to company: 'Demo' 	<LINEERROR>   24: Group 'Ward No 2' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 5  Name:    <RESPONSE>	Importing Data to company: 'Demo' 	<LINEERROR>   24: Group 'Ward No 2' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 6  Name:    <RESPONSE>	Importing Data to company: 'Demo' 	<LINEERROR>   24: Group 'Ward No 1' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 7  Name:    <RESPONSE>	Importing Data to company: 'Demo' 	<LINEERROR>   24: Group 'Ward No 2' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 8  Name:    <RESPONSE>	Importing Data to company: 'Demo' 	<LINEERROR>   24: Group 'Ward No 1' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Process Completed with Errors (Count: 7)
+ Completion Time: 06-Dec-2007 13:48:02
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\Documents and Settings\vivek.k\Desktop\vb\Datatrn.xlsto Tally: http://LOCALHOST:9090
+ Start Time: 06-Dec-2007 13:52:35
+**********************************************************************
+ Completion Time: 06-Dec-2007 13:52:38
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\Documents and Settings\vivek.k\Desktop\vb\Datatrn.xlsto Tally: http://LOCALHOST:9090
+ Start Time: 10-Dec-2007 14:24:52
+**********************************************************************
+ Completion Time: 10-Dec-2007 14:24:54
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: D:\Documents and Settings\kumar.padmanabhan\My Documents\VBCodes\Vivek\vb\Datatrn.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 10-Dec-2007 14:39:43
+**********************************************************************
+ Completion Time: 10-Dec-2007 14:39:46
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: D:\Documents and Settings\kumar.padmanabhan\My Documents\VBCodes\Vivek\vb\Datatrn.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 10-Dec-2007 14:42:06
+**********************************************************************
+**********************************************************************
+ Line No.: 2  Name:    <RESPONSE>	Importing Data to company: 'Trial Import' 	<LINEERROR>   35: Stock Group 'Commercial' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 3  Name:    <RESPONSE>	Importing Data to company: 'Trial Import' 	<LINEERROR>   35: Stock Group 'Government' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 4  Name:    <RESPONSE>	Importing Data to company: 'Trial Import' 	<LINEERROR>   35: Stock Group 'Industrial' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 5  Name:    <RESPONSE>	Importing Data to company: 'Trial Import' 	<LINEERROR>   35: Stock Group 'Residential' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 6  Name:    <RESPONSE>	Importing Data to company: 'Trial Import' 	<LINEERROR>   35: Stock Group 'Commercial' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Process Completed with Errors (Count: 5)
+ Completion Time: 10-Dec-2007 14:42:10
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: D:\Documents and Settings\kumar.padmanabhan\My Documents\VBCodes\Vivek\vb\Datatrn.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 10-Dec-2007 14:45:22
+**********************************************************************
+**********************************************************************
+ Line No.: 2  Name:    <RESPONSE>	Importing Data to company: 'Trial Import' 	<LINEERROR>   35: Unit 'SqFt' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 3  Name:    <RESPONSE>	Importing Data to company: 'Trial Import' 	<LINEERROR>   35: Unit 'SqFt' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 4  Name:    <RESPONSE>	Importing Data to company: 'Trial Import' 	<LINEERROR>   35: Unit 'SqFt' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 5  Name:    <RESPONSE>	Importing Data to company: 'Trial Import' 	<LINEERROR>   35: Unit 'SqFt' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 6  Name:    <RESPONSE>	Importing Data to company: 'Trial Import' 	<LINEERROR>   35: Unit 'SqFt' does not exist!</LINEERROR>	<CREATED>0</CREATED>	<ALTERED>0</ALTERED>	<LASTVCHID>0</LASTVCHID>	<LASTMID>0</LASTMID>	<COMBINED>0</COMBINED>	<IGNORED>0</IGNORED>	<ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Process Completed with Errors (Count: 5)
+ Completion Time: 10-Dec-2007 14:45:24
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: D:\Documents and Settings\kumar.padmanabhan\My Documents\VBCodes\Vivek\vb\Datatrn.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 10-Dec-2007 14:46:17
+**********************************************************************
+ Completion Time: 10-Dec-2007 14:46:18
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: D:\Documents and Settings\kumar.padmanabhan\My Documents\VBCodes\Vivek\vb\Datatrn.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 11-Dec-2007 14:50:24
+**********************************************************************
+ Completion Time: 11-Dec-2007 14:50:26
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\Documents and Settings\kumar.padmanabhan\Desktop\Integration\Case 1 - Importing Masters\Sample Data.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 13-Feb-2009 11:23:12
+**********************************************************************
+ Completion Time: 13-Feb-2009 11:23:14
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\Documents and Settings\kumar.padmanabhan\Desktop\Integration\Case 1 - Importing Masters\Sample Data.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 13-Feb-2009 11:30:58
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\Documents and Settings\kumar.padmanabhan\Desktop\Integration\Case 1 - Importing Masters\Sample Data.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 13-Feb-2009 11:32:04
+**********************************************************************
+**********************************************************************
+ Line No.: 2  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: Ledger &apos;Ram &amp; Co.&apos; already exists!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 3  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: Ledger &apos;Syscon Computers Ltd.&apos; already exists!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 4  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: Ledger &apos;Airtel Communications&apos; already exists!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 5  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: Ledger &apos;Shakti Traders&apos; already exists!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 6  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: Ledger &apos;Emco Transformers Pvt. Ltd.&apos; already exists!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 7  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: Ledger &apos;EMI Transmission&apos; already exists!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 8  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: Ledger &apos;Vedha Automation&apos; already exists!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Process Completed with Errors (Count: 7)
+ Completion Time: 13-Feb-2009 11:32:06
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\Documents and Settings\kumar.padmanabhan\Desktop\Integration\Case 1 - Importing Masters\Sample Data.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 13-Feb-2009 11:32:33
+**********************************************************************
+**********************************************************************
+ Line No.: 4  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: State &apos;Maharastra&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 7  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: State &apos;Maharastra&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Process Completed with Errors (Count: 2)
+ Completion Time: 13-Feb-2009 11:32:35
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\Documents and Settings\kumar.padmanabhan\Desktop\Integration\Case 1 - Importing Masters\Sample Data.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 13-Feb-2009 12:13:25
+**********************************************************************
+**********************************************************************
+ Line No.: 4  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: State &apos;Maharastra&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 7  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: State &apos;Maharastra&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Process Completed with Errors (Count: 2)
+ Completion Time: 13-Feb-2009 12:13:26
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\Documents and Settings\kumar.padmanabhan\Desktop\Integration\Case 1 - Importing Masters\Sample Data.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 13-Feb-2009 12:13:59
+**********************************************************************
+**********************************************************************
+ Line No.: 2  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Unit &apos;SqFt&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 3  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Unit &apos;SqFt&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 4  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Unit &apos;SqFt&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 5  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Unit &apos;SqFt&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 6  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Unit &apos;SqFt&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 7  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Unit &apos;SqFt&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Process Completed with Errors (Count: 6)
+ Completion Time: 13-Feb-2009 12:14:01
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\Documents and Settings\kumar.padmanabhan\Desktop\Integration\Case 1 - Importing Masters\Sample Data.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 13-Feb-2009 12:15:01
+**********************************************************************
+ Completion Time: 13-Feb-2009 12:15:03
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\Documents and Settings\kumar.padmanabhan\Desktop\Integration\Case 1 - Importing Masters\Sample Data.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 13-Feb-2009 12:20:28
+**********************************************************************
+ Completion Time: 13-Feb-2009 12:20:30
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\Documents and Settings\kumar.padmanabhan\Desktop\Integration\Case 1 - Importing Masters\Sample Data.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 13-Feb-2009 12:29:07
+**********************************************************************
+ Completion Time: 13-Feb-2009 12:29:09
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\Documents and Settings\kumar.padmanabhan\Desktop\Integration\Case 1 - Importing Masters\Sample Data.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 13-Feb-2009 12:31:20
+**********************************************************************
+ Completion Time: 13-Feb-2009 12:31:23
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\Documents and Settings\kumar.padmanabhan\Desktop\Integration\Case 1 - Importing Masters\Sample Data.xlsto Tally: http://LOCALHOST:10801
+ Start Time: 16-Feb-2009 11:23:35
+**********************************************************************
+**********************************************************************
+ Line No.: 4  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: State &apos;Maharastra&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 7  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: State &apos;Maharastra&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Process Completed with Errors (Count: 2)
+ Completion Time: 16-Feb-2009 11:23:37
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\My Folder\Projects from Nov\XML Formats\Sample Codes\VB\Case 1 - Importing Masters\Sample Data.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 27-Feb-2009 11:06:16
+**********************************************************************
+**********************************************************************
+ Line No.: 2  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Stock Item &apos;Monitor&apos; already exists!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 3  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Stock Item &apos;Mouse&apos; already exists!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 4  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Stock Group &apos;Hardware&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 5  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Stock Item &apos;Keyboard&apos; already exists!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 6  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Stock Group &apos;Laptops&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 7  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Stock Group &apos;Laptops&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Process Completed with Errors (Count: 6)
+ Completion Time: 27-Feb-2009 11:06:20
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\My Folder\Projects from Nov\Integration\Demo Samples\Sample Codes\VB\Case 1 - Importing Masters\Sample Data.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 02-Jun-2009 15:42:03
+**********************************************************************
+**********************************************************************
+ Line No.: 2  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Stock Item &apos;Monitor&apos; already exists!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 3  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Stock Item &apos;Mouse&apos; already exists!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 4  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Stock Group &apos;Hardware&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 5  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Stock Item &apos;Keyboard&apos; already exists!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 6  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Stock Group &apos;Laptops&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 7  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Stock Group &apos;Laptops&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Process Completed with Errors (Count: 6)
+ Completion Time: 02-Jun-2009 15:42:09
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\My Folder\Projects from Nov\Integration\Demo Samples\Sample Codes\VB\Case 1 - Importing Masters\Sample Data.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 02-Jun-2009 15:44:26
+**********************************************************************
+**********************************************************************
+ Line No.: 2  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Stock Item &apos;Monitor&apos; already exists!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 3  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Stock Item &apos;Mouse&apos; already exists!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 4  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Stock Group &apos;Hardware&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 5  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Stock Item &apos;Keyboard&apos; already exists!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 6  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Stock Group &apos;Laptops&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 7  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   37: Stock Group &apos;Laptops&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Process Completed with Errors (Count: 6)
+ Completion Time: 02-Jun-2009 15:44:31
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\My Folder\Projects from Nov\Integration\Demo Samples\Sample Codes\VB\Case 1 - Importing Masters\Sample Data.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 02-Jun-2009 15:45:04
+**********************************************************************
+**********************************************************************
+ Line No.: 4  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: State &apos;Maharastra&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 7  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: State &apos;Maharastra&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Process Completed with Errors (Count: 2)
+ Completion Time: 02-Jun-2009 15:45:07
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\My Folder\Projects from Nov\Integration\Demo Samples\Sample Codes\VB\Case 1 - Importing Masters\Sample Data.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 02-Jun-2009 16:43:53
+**********************************************************************
+**********************************************************************
+ Line No.: 3  Name:    <RESPONSE>	 <LINEERROR>   20: Unit &apos;Nos.&apos; already exists!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;) </LINEERROR>	 <CREATED>0</CREATED>	 <ALTERED>0</ALTERED>	 <LASTVCHID>0</LASTVCHID>	 <LASTMID>0</LASTMID>	 <COMBINED>0</COMBINED>	 <IGNORED>0</IGNORED>	 <ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 3  Name:    <RESPONSE>	 <LINEERROR>   22: Stock Group &apos;Hardware&apos; already exists!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;) </LINEERROR>	 <CREATED>0</CREATED>	 <ALTERED>0</ALTERED>	 <LASTVCHID>0</LASTVCHID>	 <LASTMID>0</LASTMID>	 <COMBINED>0</COMBINED>	 <IGNORED>0</IGNORED>	 <ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 4  Name:    <RESPONSE>	 <LINEERROR>   20: Unit &apos;Nos.&apos; already exists!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;) </LINEERROR>	 <CREATED>0</CREATED>	 <ALTERED>0</ALTERED>	 <LASTVCHID>0</LASTVCHID>	 <LASTMID>0</LASTMID>	 <COMBINED>0</COMBINED>	 <IGNORED>0</IGNORED>	 <ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 4  Name:    <RESPONSE>	 <LINEERROR>   22: Stock Group &apos;Hardware&apos; already exists!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;) </LINEERROR>	 <CREATED>0</CREATED>	 <ALTERED>0</ALTERED>	 <LASTVCHID>0</LASTVCHID>	 <LASTMID>0</LASTMID>	 <COMBINED>0</COMBINED>	 <IGNORED>0</IGNORED>	 <ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 5  Name:    <RESPONSE>	 <LINEERROR>   20: Unit &apos;Nos.&apos; already exists!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;) </LINEERROR>	 <CREATED>0</CREATED>	 <ALTERED>0</ALTERED>	 <LASTVCHID>0</LASTVCHID>	 <LASTMID>0</LASTMID>	 <COMBINED>0</COMBINED>	 <IGNORED>0</IGNORED>	 <ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 5  Name:    <RESPONSE>	 <LINEERROR>   22: Stock Group &apos;Hardware&apos; already exists!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;) </LINEERROR>	 <CREATED>0</CREATED>	 <ALTERED>0</ALTERED>	 <LASTVCHID>0</LASTVCHID>	 <LASTMID>0</LASTMID>	 <COMBINED>0</COMBINED>	 <IGNORED>0</IGNORED>	 <ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 6  Name:    <RESPONSE>	 <LINEERROR>   20: Unit &apos;Nos.&apos; already exists!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;) </LINEERROR>	 <CREATED>0</CREATED>	 <ALTERED>0</ALTERED>	 <LASTVCHID>0</LASTVCHID>	 <LASTMID>0</LASTMID>	 <COMBINED>0</COMBINED>	 <IGNORED>0</IGNORED>	 <ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 7  Name:    <RESPONSE>	 <LINEERROR>   20: Unit &apos;Nos.&apos; already exists!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;) </LINEERROR>	 <CREATED>0</CREATED>	 <ALTERED>0</ALTERED>	 <LASTVCHID>0</LASTVCHID>	 <LASTMID>0</LASTMID>	 <COMBINED>0</COMBINED>	 <IGNORED>0</IGNORED>	 <ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 7  Name:    <RESPONSE>	 <LINEERROR>   22: Stock Group &apos;Laptops&apos; already exists!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;) </LINEERROR>	 <CREATED>0</CREATED>	 <ALTERED>0</ALTERED>	 <LASTVCHID>0</LASTVCHID>	 <LASTMID>0</LASTMID>	 <COMBINED>0</COMBINED>	 <IGNORED>0</IGNORED>	 <ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Process Completed with Errors (Count: 9)
+ Completion Time: 02-Jun-2009 16:43:58
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\My Folder\Projects from Nov\Integration\Demo Samples\Sample Codes\VB\Case 1 - Importing Masters\Sample Data.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 02-Jun-2009 16:44:50
+**********************************************************************
+**********************************************************************
+ Line No.: 2  Name:    <RESPONSE>	 <LINEERROR>   29: State &apos;24567881&apos; does not exist!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;) </LINEERROR>	 <CREATED>0</CREATED>	 <ALTERED>0</ALTERED>	 <LASTVCHID>0</LASTVCHID>	 <LASTMID>0</LASTMID>	 <COMBINED>0</COMBINED>	 <IGNORED>0</IGNORED>	 <ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 3  Name:    <RESPONSE>	 <LINEERROR>   29: State &apos;27894152&apos; does not exist!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;) </LINEERROR>	 <CREATED>0</CREATED>	 <ALTERED>0</ALTERED>	 <LASTVCHID>0</LASTVCHID>	 <LASTMID>0</LASTMID>	 <COMBINED>0</COMBINED>	 <IGNORED>0</IGNORED>	 <ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 4  Name:    <RESPONSE>	 <LINEERROR>   29: State &apos;26541235&apos; does not exist!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;) </LINEERROR>	 <CREATED>0</CREATED>	 <ALTERED>0</ALTERED>	 <LASTVCHID>0</LASTVCHID>	 <LASTMID>0</LASTMID>	 <COMBINED>0</COMBINED>	 <IGNORED>0</IGNORED>	 <ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 5  Name:    <RESPONSE>	 <LINEERROR>   29: State &apos;28492788&apos; does not exist!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;) </LINEERROR>	 <CREATED>0</CREATED>	 <ALTERED>0</ALTERED>	 <LASTVCHID>0</LASTVCHID>	 <LASTMID>0</LASTMID>	 <COMBINED>0</COMBINED>	 <IGNORED>0</IGNORED>	 <ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 6  Name:    <RESPONSE>	 <LINEERROR>   29: State &apos;25964125&apos; does not exist!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;) </LINEERROR>	 <CREATED>0</CREATED>	 <ALTERED>0</ALTERED>	 <LASTVCHID>0</LASTVCHID>	 <LASTMID>0</LASTMID>	 <COMBINED>0</COMBINED>	 <IGNORED>0</IGNORED>	 <ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 7  Name:    <RESPONSE>	 <LINEERROR>   29: State &apos;23451456&apos; does not exist!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;) </LINEERROR>	 <CREATED>0</CREATED>	 <ALTERED>0</ALTERED>	 <LASTVCHID>0</LASTVCHID>	 <LASTMID>0</LASTMID>	 <COMBINED>0</COMBINED>	 <IGNORED>0</IGNORED>	 <ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Line No.: 8  Name:    <RESPONSE>	 <LINEERROR>   29: State &apos;23474455&apos; does not exist!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;) </LINEERROR>	 <CREATED>0</CREATED>	 <ALTERED>0</ALTERED>	 <LASTVCHID>0</LASTVCHID>	 <LASTMID>0</LASTMID>	 <COMBINED>0</COMBINED>	 <IGNORED>0</IGNORED>	 <ERRORS>1</ERRORS>	</RESPONSE>	
+**********************************************************************
+ Process Completed with Errors (Count: 7)
+ Completion Time: 02-Jun-2009 16:44:53
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\My Folder\Projects from Nov\Integration\Demo Samples\Sample Codes\VB\Case 1 - Importing Masters\Sample Data.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 02-Jun-2009 16:46:55
+**********************************************************************
+**********************************************************************
+ Line No.: 2  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: Ledger &apos;Ram &amp; Co.&apos; already exists!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;)    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 3  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: Ledger &apos;Syscon Computers Ltd.&apos; already exists!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;)    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 4  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: State &apos;Maharastra&apos; does not exist!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;)    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 5  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: Ledger &apos;Shakti Traders&apos; already exists!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;)    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 6  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: Ledger &apos;Emco Transformers Pvt. Ltd.&apos; already exists!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;)    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 7  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: State &apos;Maharastra&apos; does not exist!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;)    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 8  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: Ledger &apos;Vedha Automation&apos; already exists!(FOR OBJECT: &apos;RK Builders Pvt Ltd&apos;)    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Process Completed with Errors (Count: 7)
+ Completion Time: 02-Jun-2009 16:46:57
+**********************************************************************
+**********************************************************************
+ Exporting Data from  Filename: C:\My Folder\Projects from Nov\Integration\Demo Samples\XML Test\9_Tally.ERP 9 as a Server _VB_FrontEnd\Case 1 - Importing Masters\Sample Data.xlsto Tally: http://LOCALHOST:9000
+ Start Time: 03-Jun-2009 18:15:23
+**********************************************************************
+**********************************************************************
+ Line No.: 4  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: State &apos;Maharastra&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Line No.: 7  Name:    <ENVELOPE>	 <HEADER>	  <VERSION>1</VERSION>	  <STATUS>1</STATUS>	 </HEADER>	 <BODY>	  <DATA>	   <IMPORTRESULT>	    <LINEERROR>   24: State &apos;Maharastra&apos; does not exist!    </LINEERROR>	    <CREATED>0</CREATED>	    <ALTERED>0</ALTERED>	    <LASTVCHID>0</LASTVCHID>	    <LASTMID>0</LASTMID>	    <COMBINED>0</COMBINED>	    <IGNORED>0</IGNORED>	    <ERRORS>1</ERRORS>	   </IMPORTRESULT>	  </DATA>	 </BODY>	</ENVELOPE>	
+**********************************************************************
+ Process Completed with Errors (Count: 2)
+ Completion Time: 03-Jun-2009 18:15:26
+**********************************************************************

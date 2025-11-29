@@ -1,0 +1,21 @@
+<ENVELOPE>
+ <HEADER>
+  <VERSION>1</VERSION>
+  <STATUS>1</STATUS>
+ </HEADER>
+ <BODY>
+  <DESC>
+  </DESC>
+  <DATA>
+   <TALLYMESSAGE>
+    <LEDGER NAME="Cash" RESERVEDNAME="">
+     <NAME.LIST TYPE="String">
+      <NAME>Cash</NAME>
+     </NAME.LIST>
+     <PARENT TYPE="String">Cash-in-hand</PARENT>
+     <CLOSINGBALANCE TYPE="Amount" BV="18352572.24" NP="Y"></CLOSINGBALANCE>
+    </LEDGER>
+   </TALLYMESSAGE>
+  </DATA>
+ </BODY>
+</ENVELOPE>

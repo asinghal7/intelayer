@@ -1,0 +1,45 @@
+<ENVELOPE>
+    <HEADER>
+        <VERSION>1</VERSION>
+        <TALLYREQUEST>Export</TALLYREQUEST>
+        <TYPE>Data</TYPE>
+        <ID>MyReportVoucherTypes</ID>
+    </HEADER>
+    <BODY>
+        <DESC>
+            <STATICVARIABLES>
+                <SVEXPORTFORMAT>$$SysName:XML</SVEXPORTFORMAT>
+                <SVCURRENTCOMPANY>{{ company }}</SVCURRENTCOMPANY>
+            </STATICVARIABLES>
+            <TDL>
+                <TDLMESSAGE>
+                    <REPORT NAME="MyReportVoucherTypes">
+                        <FORMS>MyFormVoucherTypes</FORMS>
+                    </REPORT>
+                    <FORM NAME="MyFormVoucherTypes">
+                        <PARTS>MyPartVoucherTypes</PARTS>
+                    </FORM>
+                    <PART NAME="MyPartVoucherTypes">
+                        <LINES>MyLineVoucherTypes</LINES>
+                        <REPEAT>MyLineVoucherTypes : MyCollVoucherTypes</REPEAT>
+                        <SCROLLED>Vertical</SCROLLED>
+                    </PART>
+                    <LINE NAME="MyLineVoucherTypes">
+                        <FIELDS>FldName, FldGUID, FldParent, FldAlterId, FldNumberingMethod, FldIsDeemedPositive, FldAffectsStock, FldIsActive</FIELDS>
+                    </LINE>
+                    <FIELD NAME="FldName"><SET>$Name</SET><XMLTAG>NAME</XMLTAG></FIELD>
+                    <FIELD NAME="FldGUID"><SET>$GUID</SET><XMLTAG>GUID</XMLTAG></FIELD>
+                    <FIELD NAME="FldParent"><SET>$Parent</SET><XMLTAG>PARENT</XMLTAG></FIELD>
+                    <FIELD NAME="FldAlterId"><SET>if $$IsEmpty:$AlterId then "0" else $$String:$AlterId</SET><XMLTAG>ALTERID</XMLTAG></FIELD>
+                    <FIELD NAME="FldNumberingMethod"><SET>$NumberingMethod</SET><XMLTAG>NUMBERINGMETHOD</XMLTAG></FIELD>
+                    <FIELD NAME="FldIsDeemedPositive"><SET>if $IsDeemedPositive then "Yes" else "No"</SET><XMLTAG>ISDEEMEDPOSITIVE</XMLTAG></FIELD>
+                    <FIELD NAME="FldAffectsStock"><SET>if $AffectsStock then "Yes" else "No"</SET><XMLTAG>AFFECTSSTOCK</XMLTAG></FIELD>
+                    <FIELD NAME="FldIsActive"><SET>if $IsActive then "Yes" else "No"</SET><XMLTAG>ISACTIVE</XMLTAG></FIELD>
+                    <COLLECTION NAME="MyCollVoucherTypes">
+                        <TYPE>VoucherType</TYPE>
+                    </COLLECTION>
+                </TDLMESSAGE>
+            </TDL>
+        </DESC>
+    </BODY>
+</ENVELOPE>

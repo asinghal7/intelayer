@@ -1,0 +1,11 @@
+[Include : 3.2.1 - Function.txt]
+
+[Collection: Led Coll From Access]
+	ODBC	: "Driver={Microsoft Access Driver (*.mdb)};Dbq=C:\Masters.mdb;Uid=;Pwd=;"
+	SQL 	: Select * From LedgerMaster
+
+[Collection: Led Coll]
+	Source Collection 	: Led coll From Access
+	Compute 		: LedName 	: $_1
+	Compute 		: LedParent	: $_2
+	Compute 		: LedOpBal 	: $$AsAmount:$_3

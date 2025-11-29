@@ -1,0 +1,29 @@
+;; Sri Ganeshji : Sri Balaji : Sri Pitreshwarji : Sri Durgaji : Sri Venkateshwara
+
+/*
+An introductory TDL to display "Welcome to the world of TDL"
+*/
+[#Menu:Gateway of Tally]
+	Add : KeyItem : HelloTDL :s: Display : FirstTDLReport
+
+[Report: First TDL Report]
+
+	Form	: First TDL Form
+
+[Form: First TDL Form]
+
+	Parts	: First TDL Part
+
+[Part: First TDL Part]
+
+	Lines	: First TDL Line
+	
+	[Line: First TDL Line]
+
+		Fields	: First TDL Field
+
+		[Field: First TDL Field]
+
+			Set as		: "Welcome to the world of TDL"
+
+;; End-of-File

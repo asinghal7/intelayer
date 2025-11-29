@@ -1,0 +1,31 @@
+
+[Collection: CashBankLedgers]
+
+    Type    : Ledger 
+    Filter  : IsCashBankLedger
+
+[Collection: AccountLedgers]
+
+    Type    : Ledger
+    Filter  : OtherThanCashandBank
+
+[Collection: Vouchers]
+
+    Type    : Voucher
+    Filter  : IsReceiptType
+
+[System: Formula]
+   
+    IsReceiptType       : $$IsReceipt:$VoucherTypeName AND $$NumItems:AllLedgerEntries < 3
+    OtherThanCashandBank: Not ($$IsLedOfGrp:$Name:$$GroupCash OR +
+                             	   $$IsLedOfGrp:$Name:$$GroupBank OR $$IsLedOfGrp:$Name:$$GroupBankOD)
+    IsCashBankLedger    : ($$IsLedOfGrp:$Name:$$GroupCash OR +
+                             	   $$IsLedOfGrp:$Name:$$GroupBank OR $$IsLedOfGrp:$Name:$$GroupBankOD)
+
+[#Object: Voucher]
+
+    _AccountName        : $$CollectionField:$LedgerName:2:AllLedgerEntries
+    _ParticularsName    : $$CollectionField:$LedgerName:1:AllLedgerEntries
+    _ParticularsAmount  : $$CollectionField:$Amount:2:AllLedgerEntries * -1
+
+;; End-of-File
