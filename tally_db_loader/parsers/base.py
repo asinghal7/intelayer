@@ -111,6 +111,7 @@ def parse_float(s: str | None, default: float = 0.0) -> float:
     - Parentheses for negatives ((1234.56))
     - Currency symbols
     - Empty strings
+    - Unit suffixes like "/no.", "/pcs", "/kg"
     """
     if not s:
         return default
@@ -123,6 +124,9 @@ def parse_float(s: str | None, default: float = 0.0) -> float:
     is_negative = s.startswith("(") and s.endswith(")")
     if is_negative:
         s = s[1:-1]
+    
+    # Remove unit suffixes like "/no.", "/pcs", "/kg", "/nos"
+    s = re.sub(r'/\s*(no\.?|nos\.?|pcs\.?|pc\.?|kg\.?|ltr\.?|mtr\.?|unit\.?|each)?\s*$', '', s, flags=re.IGNORECASE)
     
     # Remove common non-numeric characters
     s = re.sub(r"[,₹$€£¥\s]", "", s)
@@ -143,7 +147,14 @@ def parse_float(s: str | None, default: float = 0.0) -> float:
 
 
 def parse_int(s: str | None, default: int = 0) -> int:
-    """Parse Tally integer string."""
+    """
+    Parse Tally integer string.
+    
+    Handles formats like:
+    - "45Days" -> 45
+    - "30 Days" -> 30
+    - "123" -> 123
+    """
     if not s:
         return default
     
@@ -151,10 +162,20 @@ def parse_int(s: str | None, default: int = 0) -> int:
     if not s or s.lower() in ("", "null", "none"):
         return default
     
+    # Handle "45Days" format - extract leading digits
+    match = re.match(r'^(-?\d+)', s)
+    if match:
+        try:
+            return int(match.group(1))
+        except ValueError:
+            pass
+    
     try:
         return int(float(s))  # Handle "123.0" style
     except ValueError:
-        logger.warning(f"Could not parse int: {s}")
+        # Don't warn for date-like strings that shouldn't be integers
+        if not re.match(r'\d+-\w+-\d+', s):
+            logger.warning(f"Could not parse int: {s}")
         return default
 
 

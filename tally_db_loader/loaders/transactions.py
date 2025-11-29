@@ -241,6 +241,34 @@ class TransactionLoader(DatabaseLoader):
         logger.info(f"Deleted {deleted} vouchers from {from_date} to {to_date}")
         return deleted
     
+    def clear_all_transactions(self) -> dict:
+        """
+        Clear ALL transaction data. Use before full sync.
+        
+        Deletes in order to respect foreign key constraints.
+        
+        Returns:
+            Dict with counts per table
+        """
+        tables = [
+            "trn_batch",
+            "trn_cost_centre", 
+            "trn_bill",
+            "trn_inventory",
+            "trn_accounting",
+            "trn_voucher",
+            "trn_closing_stock",
+        ]
+        
+        counts = {}
+        with self.conn.cursor() as cur:
+            for table in tables:
+                cur.execute(f"DELETE FROM {self.schema}.{table}")
+                counts[table] = cur.rowcount
+        
+        logger.info(f"Cleared all transactions: {counts}")
+        return counts
+    
     def get_voucher_date_range(self) -> tuple[date | None, date | None]:
         """Get min and max voucher dates in database."""
         with self.conn.cursor() as cur:

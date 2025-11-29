@@ -107,6 +107,7 @@ def _parse_tdl_records(xml_text: str, record_identifier: str = "NAME") -> list[e
     Returns list of pseudo-elements containing grouped fields.
     """
     from lxml import etree as ET
+    from copy import deepcopy
     
     sanitized = sanitize_xml(xml_text)
     root = ET.fromstring(sanitized.encode("utf-8"))
@@ -126,6 +127,7 @@ def _parse_tdl_records(xml_text: str, record_identifier: str = "NAME") -> list[e
         return []
     
     # Group children into records based on record_identifier
+    # Use deepcopy to avoid modifying original tree structure
     records = []
     current_record = None
     
@@ -135,9 +137,11 @@ def _parse_tdl_records(xml_text: str, record_identifier: str = "NAME") -> list[e
             if current_record is not None:
                 records.append(current_record)
             current_record = ET.Element("RECORD")
-            current_record.append(child)
+            # Use deepcopy to preserve original element
+            current_record.append(deepcopy(child))
         elif current_record is not None:
-            current_record.append(child)
+            # Use deepcopy to preserve original element
+            current_record.append(deepcopy(child))
     
     # Don't forget the last record
     if current_record is not None:

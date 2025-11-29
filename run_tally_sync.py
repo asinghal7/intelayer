@@ -5,20 +5,23 @@ Convenience script to run Tally Database Loader sync.
 This script provides a simple way to sync Tally data to PostgreSQL.
 
 Usage:
-    # Full sync
-    python run_tally_sync.py --full
-    
-    # Incremental sync (default)
+    # Full sync (default) - syncs entire financial year
     python run_tally_sync.py
+    
+    # Incremental sync - masters + last 7 days of transactions
+    python run_tally_sync.py --incremental
+    
+    # Masters only
+    python run_tally_sync.py --masters-only
+    
+    # Sync specific date range
+    python run_tally_sync.py --from-date 2024-04-01 --to-date 2024-10-31
     
     # Test connection
     python run_tally_sync.py --test
     
     # Initialize database only
     python run_tally_sync.py --init-db
-    
-    # Sync specific date range
-    python run_tally_sync.py --from-date 2024-04-01 --to-date 2024-10-31
 """
 import sys
 import argparse
@@ -42,9 +45,9 @@ def main():
     
     # Mode flags
     parser.add_argument(
-        "--full",
+        "--incremental",
         action="store_true",
-        help="Run full sync (all masters and transactions)",
+        help="Run incremental sync (masters + last 7 days of transactions)",
     )
     parser.add_argument(
         "--masters-only",
@@ -159,13 +162,7 @@ def main():
             # Initialize schema first
             sync.initialize_schema()
             
-            if args.full:
-                print("\nRunning FULL SYNC...")
-                results = sync.run_full_sync(
-                    from_date=args.from_date,
-                    to_date=args.to_date,
-                )
-            elif args.masters_only:
+            if args.masters_only:
                 print("\nSyncing MASTERS only...")
                 results = {"masters": sync.sync_masters()}
             elif args.transactions_only:
@@ -175,9 +172,16 @@ def main():
                     to_date=args.to_date,
                     batch_days=args.batch_days,
                 )}
-            else:
-                print("\nRunning INCREMENTAL SYNC...")
+            elif args.incremental:
+                print("\nRunning INCREMENTAL SYNC (masters + last 7 days)...")
                 results = sync.run_incremental_sync()
+            else:
+                # Default: Full sync for entire financial year
+                print("\nRunning FULL SYNC (entire financial year)...")
+                results = sync.run_full_sync(
+                    from_date=args.from_date,
+                    to_date=args.to_date,
+                )
             
             # Print results
             print("\n" + "=" * 60)

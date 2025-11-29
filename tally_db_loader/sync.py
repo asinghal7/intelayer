@@ -281,7 +281,7 @@ class TallySync:
         self,
         from_date: Optional[date] = None,
         to_date: Optional[date] = None,
-        batch_days: int = 30,
+        batch_days: int = 15,
         delete_existing: bool = True,
     ) -> dict:
         """
@@ -404,7 +404,7 @@ class TallySync:
         from_date: Optional[date] = None,
         to_date: Optional[date] = None,
         include_transactions: bool = True,
-        include_closing_stock: bool = False,
+        include_closing_stock: bool = True,
     ) -> dict:
         """
         Run a complete full sync of all data.
@@ -430,6 +430,10 @@ class TallySync:
             # Initialize schema
             self.initialize_schema()
             
+            # Clear all existing transaction data before full sync to prevent duplicates
+            logger.info("=== Clearing Existing Transaction Data ===")
+            self.transaction_loader.clear_all_transactions()
+            
             # Sync all masters
             logger.info("=== Syncing Master Data ===")
             results["masters"] = self.sync_masters()
@@ -437,7 +441,10 @@ class TallySync:
             # Sync transactions
             if include_transactions:
                 logger.info("=== Syncing Transactions ===")
-                results["transactions"] = self.sync_transactions(from_date, to_date)
+                # Don't delete_existing since we already cleared all
+                results["transactions"] = self.sync_transactions(
+                    from_date, to_date, delete_existing=False
+                )
             
             # Sync closing stock
             if include_closing_stock:
