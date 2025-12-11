@@ -654,9 +654,23 @@ CREATE TABLE IF NOT EXISTS tally_db.mst_opening_bill (
     is_advance BOOLEAN DEFAULT FALSE,
     
     created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
     
     UNIQUE(ledger, name)
 );
+
+-- Add updated_at column if it doesn't exist (for existing tables)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'tally_db' 
+        AND table_name = 'mst_opening_bill' 
+        AND column_name = 'updated_at'
+    ) THEN
+        ALTER TABLE tally_db.mst_opening_bill ADD COLUMN updated_at TIMESTAMPTZ DEFAULT NOW();
+    END IF;
+END $$;
 
 CREATE INDEX IF NOT EXISTS idx_mst_opening_bill_ledger ON tally_db.mst_opening_bill(ledger_lower);
 CREATE INDEX IF NOT EXISTS idx_mst_opening_bill_name ON tally_db.mst_opening_bill(name);
@@ -725,18 +739,38 @@ SELECT
 FROM bill_summary
 WHERE (billed + adjusted) < 0;
 
--- Ledger balance view
+-- Drop existing views first to allow column type changes
+DROP VIEW IF EXISTS tally_db.view_ledger_balance CASCADE;
+DROP VIEW IF EXISTS tally_db.view_ledger_opening_balance CASCADE;
+
+-- View to aggregate opening balances from bill allocations per ledger
+-- This provides accurate opening balances derived from individual bill records
+CREATE OR REPLACE VIEW tally_db.view_ledger_opening_balance AS
+SELECT
+    ob.ledger,
+    LOWER(ob.ledger) AS ledger_lower,
+    SUM(ob.opening_balance)::NUMERIC(17,2) AS opening_balance_from_bills,
+    COUNT(*) AS bill_count
+FROM tally_db.mst_opening_bill ob
+GROUP BY ob.ledger;
+
+-- Ledger balance view (uses opening balance from bill allocations when available)
+-- Falls back to ledger's opening_balance if no bill allocations exist
 CREATE OR REPLACE VIEW tally_db.view_ledger_balance AS
 SELECT
     l.name AS ledger,
     l.parent AS group_name,
     l.primary_group,
-    l.opening_balance,
-    COALESCE(SUM(a.amount), 0) AS transaction_total,
-    l.opening_balance + COALESCE(SUM(a.amount), 0) AS closing_balance
+    -- Use opening balance from bill allocations if available, else use ledger's opening_balance
+    COALESCE(ob.opening_balance_from_bills, l.opening_balance, 0)::NUMERIC(17,2) AS opening_balance,
+    l.opening_balance AS ledger_opening_balance,
+    ob.opening_balance_from_bills AS bills_opening_balance,
+    COALESCE(SUM(a.amount), 0)::NUMERIC(17,2) AS transaction_total,
+    (COALESCE(ob.opening_balance_from_bills, l.opening_balance, 0) + COALESCE(SUM(a.amount), 0))::NUMERIC(17,2) AS closing_balance
 FROM tally_db.mst_ledger l
+LEFT JOIN tally_db.view_ledger_opening_balance ob ON ob.ledger_lower = l.name_lower
 LEFT JOIN tally_db.trn_accounting a ON a.ledger_lower = l.name_lower
-GROUP BY l.name, l.parent, l.primary_group, l.opening_balance;
+GROUP BY l.name, l.parent, l.primary_group, l.opening_balance, ob.opening_balance_from_bills;
 
 -- Daily voucher summary view
 CREATE OR REPLACE VIEW tally_db.view_daily_summary AS

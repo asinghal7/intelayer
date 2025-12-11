@@ -20,6 +20,7 @@ from .masters import (
     parse_cost_centres,
     parse_voucher_types,
     parse_currencies,
+    parse_opening_bill_allocations,
 )
 from .transactions import (
     parse_vouchers,
@@ -51,6 +52,7 @@ __all__ = [
     "parse_cost_centres",
     "parse_voucher_types",
     "parse_currencies",
+    "parse_opening_bill_allocations",
     # Transactions
     "parse_vouchers",
     "parse_accounting_entries",

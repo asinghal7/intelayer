@@ -85,6 +85,46 @@ class MasterLoader(DatabaseLoader):
         logger.info(f"Loaded {count} opening bills")
         return count
     
+    def update_ledger_opening_balances_from_bills(self) -> int:
+        """
+        Update mst_ledger.opening_balance from the sum of mst_opening_bill records.
+        
+        This corrects the opening balance which is incorrectly fetched from TDL
+        (TDL's $OpeningBalance returns today's opening, not FY start opening).
+        
+        - Ledgers with bills in mst_opening_bill: opening_balance = SUM(bill.opening_balance)
+        - Ledgers without bills: opening_balance = 0
+        
+        Returns:
+            Number of ledgers updated
+        """
+        sql = f"""
+            WITH bill_totals AS (
+                SELECT 
+                    ledger_lower,
+                    SUM(opening_balance) AS total_opening
+                FROM {self.schema}.mst_opening_bill
+                GROUP BY ledger_lower
+            )
+            UPDATE {self.schema}.mst_ledger l
+            SET opening_balance = COALESCE(bt.total_opening, 0)
+            FROM (
+                SELECT 
+                    ml.name_lower,
+                    bt.total_opening
+                FROM {self.schema}.mst_ledger ml
+                LEFT JOIN bill_totals bt ON bt.ledger_lower = ml.name_lower
+            ) AS bt
+            WHERE l.name_lower = bt.name_lower
+        """
+        
+        with self.conn.cursor() as cur:
+            cur.execute(sql)
+            updated = cur.rowcount
+        
+        logger.info(f"Updated opening balances for {updated} ledgers from bill allocations")
+        return updated
+    
     def load_stock_groups(self, rows: list[dict]) -> int:
         """Load stock groups."""
         if not rows:

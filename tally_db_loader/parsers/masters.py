@@ -226,6 +226,11 @@ def parse_ledgers(xml_text: str) -> tuple[list[dict], list[dict]]:
     Returns tuple of (ledgers, opening_bills) where opening_bills are
     extracted from LEDGERBILLALLOCATIONS within ledger elements.
     """
+    from pathlib import Path
+    debug_file = Path("debug_ledgers_full_response.xml")
+    debug_file.write_text(xml_text, encoding="utf-8")
+    logger.info(f"DEBUG: Saved full XML to {debug_file}")
+    
     parser = TallyXMLParser(xml_text)
     ledgers = []
     opening_bills = []
@@ -964,4 +969,78 @@ def parse_currencies(xml_text: str) -> list[dict]:
     
     logger.debug(f"Parsed {len(items)} currencies")
     return items
+
+
+def parse_opening_bill_allocations(xml_text: str) -> list[dict]:
+    """
+    Parse opening bill allocations from Tally "List of Accounts" export.
+    
+    This uses the XML response from "List of Accounts" with EXPLODEFLAG=Yes,
+    which returns nested LEDGER elements with BILLALLOCATIONS.LIST children.
+    
+    The BILLALLOCATIONS.LIST contains:
+    - NAME: Bill reference name
+    - BILLDATE: Bill date
+    - OPENINGBALANCE: Opening balance amount for this bill
+    - BILLCREDITPERIOD: Credit period in days
+    - ISADVANCE: Whether it's an advance
+    
+    Returns list of dicts with keys:
+    - ledger: Ledger name
+    - ledger_lower: Ledger name (lowercase)
+    - name: Bill reference name
+    - bill_date: Bill date
+    - opening_balance: Opening balance amount
+    - bill_credit_period: Credit period in days
+    - is_advance: Whether it's an advance
+    """
+    sanitized = sanitize_xml(xml_text)
+    root = etree.fromstring(sanitized.encode("utf-8"))
+    
+    out: list[dict] = []
+    
+    # Iterate Ledgers and their BILLALLOCATIONS children
+    # The "List of Accounts" export returns <LEDGER NAME="..."> elements
+    for ledger in root.findall(".//LEDGER"):
+        ledger_name = ledger.get("NAME")
+        if not ledger_name:
+            continue
+        
+        # Look for bill allocations within this ledger
+        # Try multiple possible element names
+        bill_allocs = (
+            ledger.findall(".//BILLALLOCATIONS.LIST") or
+            ledger.findall(".//LEDGERBILLALLOCATIONS.LIST") or
+            ledger.findall(".//OPENINGBILLALLOCATIONS.LIST")
+        )
+        
+        for bill in bill_allocs:
+            name = text(bill, "NAME")
+            bill_date_str = text(bill, "BILLDATE")
+            opening_balance = parse_float(text(bill, "OPENINGBALANCE"), default=0.0)
+            bill_credit_period_str = text(bill, "BILLCREDITPERIOD")
+            is_advance = parse_bool(text(bill, "ISADVANCE"))
+            
+            # Normalize credit period to int
+            credit_days = None
+            if bill_credit_period_str:
+                credit_days = parse_int(bill_credit_period_str, default=None)
+            
+            # Parse bill date
+            bill_date = parse_tally_date(bill_date_str) if bill_date_str else None
+            
+            # Only include if we have a bill name
+            if name:
+                out.append({
+                    "ledger": ledger_name.strip(),
+                    "ledger_lower": ledger_name.strip().lower(),
+                    "name": name.strip(),
+                    "bill_date": bill_date,
+                    "opening_balance": round(opening_balance, 2),
+                    "bill_credit_period": credit_days,
+                    "is_advance": bool(is_advance),
+                })
+    
+    logger.debug(f"Parsed {len(out)} opening bill allocations")
+    return out
 

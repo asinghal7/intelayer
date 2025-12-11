@@ -32,6 +32,7 @@ from .parsers.masters import (
     parse_cost_centres,
     parse_voucher_types,
     parse_currencies,
+    parse_opening_bill_allocations,
 )
 from .parsers.transactions import parse_vouchers, parse_closing_stock
 
@@ -277,6 +278,55 @@ class TallySync:
         
         return results
     
+    def sync_opening_bills(self, save_xml: bool = False) -> int:
+        """
+        Sync opening bill allocations from ledger masters.
+        
+        Uses "List of Accounts" with EXPLODEFLAG=Yes to get nested bill allocations,
+        which provides accurate opening balances per bill.
+        
+        This is a separate sync step because:
+        1. The TDL report for ledgers returns flat structure without nested bills
+        2. "List of Accounts" returns nested BILLALLOCATIONS.LIST elements
+        3. Opening balances can then be derived from these bill allocations
+        
+        Args:
+            save_xml: If True, save raw XML response for debugging
+            
+        Returns:
+            Number of opening bills synced
+        """
+        logger.info("Syncing opening bill allocations...")
+        
+        try:
+            # Fetch from Tally using "List of Accounts" with EXPLODEFLAG
+            xml_request = self._render_template("ledgers_opening_bills.xml.j2")
+            xml_response = self.client.post_xml(xml_request)
+            
+            # Debug: save raw XML if requested
+            if save_xml:
+                debug_file = Path("debug_opening_bills.xml")
+                debug_file.write_text(xml_response, encoding="utf-8")
+                logger.debug(f"  Saved raw XML to {debug_file}")
+            
+            # Parse opening bill allocations
+            opening_bills = parse_opening_bill_allocations(xml_response)
+            
+            # Load into database
+            count = self.master_loader.load_opening_bills(opening_bills)
+            
+            # Update mst_ledger.opening_balance from the bill totals
+            # This corrects the incorrect opening balances from TDL
+            updated = self.master_loader.update_ledger_opening_balances_from_bills()
+            logger.info(f"  Updated opening balances for {updated} ledgers")
+            
+            logger.info(f"  Synced {count} opening bill allocations")
+            return count
+            
+        except Exception as e:
+            logger.error(f"Failed to sync opening bills: {e}")
+            raise
+    
     def sync_transactions(
         self,
         from_date: Optional[date] = None,
@@ -423,6 +473,7 @@ class TallySync:
         try:
             results = {
                 "masters": {},
+                "opening_bills": 0,
                 "transactions": {},
                 "closing_stock": 0,
             }
@@ -437,6 +488,10 @@ class TallySync:
             # Sync all masters
             logger.info("=== Syncing Master Data ===")
             results["masters"] = self.sync_masters()
+            
+            # Sync opening bills (separate step using "List of Accounts")
+            logger.info("=== Syncing Opening Bill Allocations ===")
+            results["opening_bills"] = self.sync_opening_bills()
             
             # Sync transactions
             if include_transactions:
@@ -485,6 +540,7 @@ class TallySync:
         try:
             results = {
                 "masters": {},
+                "opening_bills": 0,
                 "transactions": {},
             }
             
@@ -492,6 +548,10 @@ class TallySync:
             # In practice, unchanged data will just be upserted with same values
             logger.info("=== Incremental Master Sync ===")
             results["masters"] = self.sync_masters()
+            
+            # Sync opening bills (separate step using "List of Accounts")
+            logger.info("=== Syncing Opening Bill Allocations ===")
+            results["opening_bills"] = self.sync_opening_bills()
             
             # For transactions, sync last 7 days to catch any late edits
             logger.info("=== Incremental Transaction Sync ===")
