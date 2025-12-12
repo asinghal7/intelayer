@@ -338,7 +338,7 @@ class TallySync:
         Sync transaction data (vouchers and related entries).
         
         Args:
-            from_date: Start date (defaults to FY start)
+            from_date: Start date (defaults to company's books_from, or current FY start)
             to_date: End date (defaults to today)
             batch_days: Days per batch to avoid timeout
             delete_existing: Whether to delete existing data in range first
@@ -346,11 +346,20 @@ class TallySync:
         Returns:
             Dict with counts by entity type
         """
-        # Default to current financial year
         today = date.today()
+        
+        # Default from_date: prefer company's books_from date for consistency with opening balances
+        # Fall back to current financial year start if books_from not available
         if from_date is None:
-            fy_start_year = today.year if today.month >= 4 else today.year - 1
-            from_date = date(fy_start_year, 4, 1)
+            from_date = self._get_books_from_date()
+            if from_date is None:
+                # Fallback to current FY start
+                fy_start_year = today.year if today.month >= 4 else today.year - 1
+                from_date = date(fy_start_year, 4, 1)
+                logger.info(f"No books_from date found, using current FY start: {from_date}")
+            else:
+                logger.info(f"Using company books_from date: {from_date}")
+        
         if to_date is None:
             to_date = today
         
@@ -449,6 +458,24 @@ class TallySync:
         logger.info(f"Synced {count} closing stock entries")
         return count
     
+    def _get_books_from_date(self) -> Optional[date]:
+        """
+        Get the books_from date for transaction sync.
+        
+        This is the date from which Tally books start, and should be used
+        as the default start date for transaction sync to ensure consistency
+        with opening balances.
+        
+        The date is configured via TALLY_BOOKS_FROM environment variable.
+        Format: YYYY-MM-DD or YYYYMMDD (e.g., 2023-04-01 or 20230401)
+        
+        Returns:
+            books_from date from config if available, else None
+        """
+        if self.config.books_from:
+            return self.config.books_from
+        return None
+    
     def run_full_sync(
         self,
         from_date: Optional[date] = None,
@@ -460,8 +487,8 @@ class TallySync:
         Run a complete full sync of all data.
         
         Args:
-            from_date: Transaction start date
-            to_date: Transaction end date
+            from_date: Transaction start date (defaults to company's books_from date)
+            to_date: Transaction end date (defaults to today)
             include_transactions: Whether to sync transactions
             include_closing_stock: Whether to sync closing stock
             
@@ -492,6 +519,14 @@ class TallySync:
             # Sync opening bills (separate step using "List of Accounts")
             logger.info("=== Syncing Opening Bill Allocations ===")
             results["opening_bills"] = self.sync_opening_bills()
+            
+            # Determine transaction date range
+            # For full sync: use company's books_from date as default start
+            # This ensures transactions are loaded from the same date as opening balances
+            if from_date is None:
+                from_date = self._get_books_from_date()
+                if from_date:
+                    logger.info(f"Using company books_from date as transaction start: {from_date}")
             
             # Sync transactions
             if include_transactions:

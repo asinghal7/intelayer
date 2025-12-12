@@ -471,8 +471,11 @@ CREATE TABLE IF NOT EXISTS tally_db.trn_accounting (
     ledger_lower TEXT,
     parent TEXT,
     
-    -- Amounts
-    amount NUMERIC(17, 2) DEFAULT 0,
+    -- Amounts (following open source tally-database-loader structure)
+    -- In Tally: negative amount = debit, positive amount = credit
+    amount NUMERIC(17, 2) DEFAULT 0,           -- Original signed amount from Tally
+    amount_debit NUMERIC(17, 2) DEFAULT 0,     -- Absolute debit amount (when amount < 0)
+    amount_credit NUMERIC(17, 2) DEFAULT 0,    -- Absolute credit amount (when amount > 0)
     
     -- Classification
     is_party_ledger BOOLEAN DEFAULT FALSE,
@@ -676,13 +679,60 @@ CREATE INDEX IF NOT EXISTS idx_mst_opening_bill_ledger ON tally_db.mst_opening_b
 CREATE INDEX IF NOT EXISTS idx_mst_opening_bill_name ON tally_db.mst_opening_bill(name);
 
 -- =============================================================================
+-- MIGRATION: Add amount_debit/amount_credit to trn_accounting (for existing databases)
+-- Following open source tally-database-loader structure
+-- =============================================================================
+DO $$
+BEGIN
+    -- Add amount_debit column if it doesn't exist
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'tally_db' 
+        AND table_name = 'trn_accounting' 
+        AND column_name = 'amount_debit'
+    ) THEN
+        ALTER TABLE tally_db.trn_accounting ADD COLUMN amount_debit NUMERIC(17, 2) DEFAULT 0;
+    END IF;
+    
+    -- Add amount_credit column if it doesn't exist
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns 
+        WHERE table_schema = 'tally_db' 
+        AND table_name = 'trn_accounting' 
+        AND column_name = 'amount_credit'
+    ) THEN
+        ALTER TABLE tally_db.trn_accounting ADD COLUMN amount_credit NUMERIC(17, 2) DEFAULT 0;
+    END IF;
+END $$;
+
+-- Backfill existing records: derive debit/credit from signed amount
+-- In Tally: negative amount = debit, positive amount = credit
+UPDATE tally_db.trn_accounting
+SET 
+    amount_debit = CASE WHEN amount < 0 THEN ABS(amount) ELSE 0 END,
+    amount_credit = CASE WHEN amount > 0 THEN amount ELSE 0 END
+WHERE amount_debit = 0 AND amount_credit = 0 AND amount <> 0;
+
+-- =============================================================================
 -- COMPUTED VIEWS
 -- =============================================================================
 
+-- Drop existing views first to allow column type changes
+DROP VIEW IF EXISTS tally_db.view_bills_outstanding CASCADE;
+
 -- Outstanding bills view (combines opening and transaction bills)
+-- Following open source tally-database-loader methodology for proper original_amount tracking
+-- 
+-- Key concepts:
+-- 1. "New Ref" bills in transactions = original invoice amount (this IS the original)
+-- 2. "Opening" bills from mst_opening_bill = remaining balance at period start
+--    To get original: opening_balance + total adjustments made to this bill
+-- 3. "Agst Ref" bills = payments/adjustments against the original bill
+-- 4. "Advance" = advance payment (tracked separately)
+--
 CREATE OR REPLACE VIEW tally_db.view_bills_outstanding AS
 WITH bill_movements AS (
-    -- Opening bills (New Ref)
+    -- Opening bills (remaining balance from previous periods)
     SELECT
         ledger,
         name,
@@ -690,7 +740,8 @@ WITH bill_movements AS (
         opening_balance AS amount,
         'Opening' AS bill_type,
         bill_credit_period,
-        is_advance
+        is_advance,
+        NULL::NUMERIC(17,2) AS new_ref_amount  -- Opening doesn't have original, will be calculated
     FROM tally_db.mst_opening_bill
     WHERE opening_balance IS NOT NULL AND opening_balance <> 0
     
@@ -704,7 +755,9 @@ WITH bill_movements AS (
         b.amount,
         b.bill_type,
         b.bill_credit_period,
-        FALSE AS is_advance
+        FALSE AS is_advance,
+        -- For "New Ref", the amount IS the original invoice amount
+        CASE WHEN b.bill_type = 'New Ref' THEN ABS(b.amount) ELSE NULL END AS new_ref_amount
     FROM tally_db.trn_bill b
     JOIN tally_db.trn_voucher v ON v.guid = b.voucher_guid
     WHERE b.name IS NOT NULL AND b.name <> ''
@@ -713,11 +766,23 @@ bill_summary AS (
     SELECT
         ledger,
         name,
-        MAX(date) AS bill_date,
+        -- Bill date: earliest date when bill was created (from New Ref or Opening)
+        MIN(CASE WHEN bill_type IN ('New Ref', 'Opening') THEN date END) AS bill_date,
+        -- Credit period from bill metadata
         MAX(bill_credit_period) AS credit_period,
+        -- Whether any entry is an advance
         BOOL_OR(is_advance) AS is_advance,
-        SUM(CASE WHEN bill_type IN ('New Ref', 'Advance', 'Opening') THEN amount ELSE 0 END) AS billed,
-        SUM(CASE WHEN bill_type = 'Agst Ref' THEN amount ELSE 0 END) AS adjusted,
+        -- Opening balance (from mst_opening_bill)
+        SUM(CASE WHEN bill_type = 'Opening' THEN amount ELSE 0 END) AS opening_balance,
+        -- New bills created in current period (New Ref)
+        SUM(CASE WHEN bill_type = 'New Ref' THEN amount ELSE 0 END) AS new_ref_total,
+        -- Advances
+        SUM(CASE WHEN bill_type = 'Advance' THEN amount ELSE 0 END) AS advance_total,
+        -- Total adjustments made (Agst Ref - these reduce the outstanding)
+        SUM(CASE WHEN bill_type = 'Agst Ref' THEN amount ELSE 0 END) AS adjusted_total,
+        -- Original amount from "New Ref" transactions (this IS the original invoice amount)
+        MAX(new_ref_amount) AS tracked_original,
+        -- Latest adjustment date
         MAX(CASE WHEN bill_type = 'Agst Ref' THEN date END) AS last_adjusted_date
     FROM bill_movements
     GROUP BY ledger, name
@@ -726,18 +791,29 @@ SELECT
     ledger,
     name AS bill_name,
     bill_date,
+    -- Due date calculation
     CASE 
         WHEN bill_date IS NOT NULL AND credit_period > 0 
         THEN (bill_date + (credit_period || ' days')::INTERVAL)::DATE
         ELSE NULL
     END AS due_date,
-    ABS(billed) AS original_amount,
-    ABS(adjusted) AS adjusted_amount,
-    ABS(billed + adjusted) AS pending_amount,
+    -- Original Amount Logic:
+    -- 1. If we have a "New Ref" entry, use that as original (most accurate)
+    -- 2. If only "Opening", reconstruct: opening_balance + |adjusted_total|
+    --    (because opening is what's left after prior adjustments)
+    COALESCE(
+        tracked_original,  -- Original from "New Ref" if available
+        ABS(opening_balance) + ABS(adjusted_total)  -- Reconstruct from opening + adjustments
+    )::NUMERIC(17,2) AS original_amount,
+    -- Total amount adjusted so far
+    ABS(adjusted_total)::NUMERIC(17,2) AS adjusted_amount,
+    -- Pending amount = opening + new_ref + advance + adjusted (adjusted is typically negative/opposite sign)
+    ABS(opening_balance + new_ref_total + advance_total + adjusted_total)::NUMERIC(17,2) AS pending_amount,
     is_advance,
     last_adjusted_date
 FROM bill_summary
-WHERE (billed + adjusted) < 0;
+-- Only show bills with non-zero pending balance
+WHERE ABS(opening_balance + new_ref_total + advance_total + adjusted_total) > 0.01;
 
 -- Drop existing views first to allow column type changes
 DROP VIEW IF EXISTS tally_db.view_ledger_balance CASCADE;
@@ -756,6 +832,7 @@ GROUP BY ob.ledger;
 
 -- Ledger balance view (uses opening balance from bill allocations when available)
 -- Falls back to ledger's opening_balance if no bill allocations exist
+-- Following open source tally-database-loader approach with separate debit/credit columns
 CREATE OR REPLACE VIEW tally_db.view_ledger_balance AS
 SELECT
     l.name AS ledger,
@@ -765,7 +842,13 @@ SELECT
     COALESCE(ob.opening_balance_from_bills, l.opening_balance, 0)::NUMERIC(17,2) AS opening_balance,
     l.opening_balance AS ledger_opening_balance,
     ob.opening_balance_from_bills AS bills_opening_balance,
+    -- Total Debit: sum of all debit amounts (positive values in amount_debit column)
+    COALESCE(SUM(a.amount_debit), 0)::NUMERIC(17,2) AS total_debit,
+    -- Total Credit: sum of all credit amounts (positive values in amount_credit column)
+    COALESCE(SUM(a.amount_credit), 0)::NUMERIC(17,2) AS total_credit,
+    -- Net transaction total (credits - debits, using original signed amount)
     COALESCE(SUM(a.amount), 0)::NUMERIC(17,2) AS transaction_total,
+    -- Closing balance = opening + transaction_total
     (COALESCE(ob.opening_balance_from_bills, l.opening_balance, 0) + COALESCE(SUM(a.amount), 0))::NUMERIC(17,2) AS closing_balance
 FROM tally_db.mst_ledger l
 LEFT JOIN tally_db.view_ledger_opening_balance ob ON ob.ledger_lower = l.name_lower

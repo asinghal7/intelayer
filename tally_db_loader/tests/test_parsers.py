@@ -241,6 +241,15 @@ class TestTransactionParsers:
         party_entry = next(e for e in result["accounting"] if e["is_party_ledger"])
         assert party_entry["ledger"] == "ABC Corp"
         assert party_entry["amount"] == -11800
+        # Verify debit/credit calculation (negative amount = debit)
+        assert party_entry["amount_debit"] == 11800  # abs(-11800)
+        assert party_entry["amount_credit"] == 0
+        
+        # Check a credit entry (Sales @ 18%)
+        sales_entry = next(e for e in result["accounting"] if e["ledger"] == "Sales @ 18%")
+        assert sales_entry["amount"] == 10000  # positive = credit
+        assert sales_entry["amount_debit"] == 0
+        assert sales_entry["amount_credit"] == 10000
         
         # Check inventory entries
         assert len(result["inventory"]) == 1

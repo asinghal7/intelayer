@@ -167,7 +167,16 @@ def _extract_voucher_amount(elem: etree._Element) -> float:
 
 
 def _parse_accounting_entries(voucher: etree._Element, voucher_guid: str) -> list[dict]:
-    """Parse accounting (ledger) entries from voucher."""
+    """
+    Parse accounting (ledger) entries from voucher.
+    
+    Following open source tally-database-loader convention:
+    - In Tally XML: negative amount = debit, positive amount = credit
+    - amount_debit = ABS(amount) when amount < 0, else 0
+    - amount_credit = amount when amount > 0, else 0
+    
+    This allows proper debit/credit tracking in view_ledger_balance.
+    """
     entries = []
     seen = set()  # Track unique entries to avoid duplicates
     
@@ -187,12 +196,19 @@ def _parse_accounting_entries(voucher: etree._Element, voucher_guid: str) -> lis
                 continue
             seen.add(key)
             
+            # Calculate debit and credit amounts from signed amount
+            # In Tally: negative amount = debit, positive amount = credit
+            amount_debit = abs(amount) if amount < 0 else 0.0
+            amount_credit = amount if amount > 0 else 0.0
+            
             entry = {
                 "voucher_guid": voucher_guid,
                 "ledger": ledger,
                 "ledger_lower": ledger.lower() if ledger else None,
                 "parent": text(le, "PARENT"),
                 "amount": amount,
+                "amount_debit": amount_debit,
+                "amount_credit": amount_credit,
                 "is_party_ledger": parse_bool(text(le, "ISPARTYLEDGER")),
                 "is_deemed_positive": parse_bool(text(le, "ISDEEMEDPOSITIVE")),
                 "gst_class": text(le, "GSTCLASS"),

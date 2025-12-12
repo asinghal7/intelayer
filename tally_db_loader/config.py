@@ -7,10 +7,28 @@ Reuses the existing Intelayer connection settings where applicable.
 from __future__ import annotations
 import os
 from dataclasses import dataclass, field
+from datetime import date
 from typing import Optional
 from dotenv import load_dotenv
 
 load_dotenv()
+
+
+def _parse_books_from_date() -> Optional[date]:
+    """Parse TALLY_BOOKS_FROM environment variable to date."""
+    env_val = os.getenv("TALLY_BOOKS_FROM")
+    if not env_val:
+        return None
+    try:
+        # Support formats: YYYY-MM-DD or YYYYMMDD
+        env_val = env_val.strip()
+        if "-" in env_val:
+            return date.fromisoformat(env_val)
+        elif len(env_val) == 8:
+            return date(int(env_val[:4]), int(env_val[4:6]), int(env_val[6:8]))
+    except (ValueError, TypeError):
+        pass
+    return None
 
 
 @dataclass
@@ -44,6 +62,12 @@ class TallyLoaderConfig:
     retry_delay: float = field(
         default_factory=lambda: float(os.getenv("TALLY_RETRY_DELAY", "1.0"))
     )
+    
+    # Books from date - the date from which Tally books start
+    # Set via TALLY_BOOKS_FROM env var (format: YYYY-MM-DD or YYYYMMDD)
+    # This is used as the default start date for full sync transactions
+    # Example: TALLY_BOOKS_FROM=2023-04-01
+    books_from: Optional[date] = field(default_factory=_parse_books_from_date)
 
     # Logging
     log_level: str = field(default_factory=lambda: os.getenv("LOG_LEVEL", "INFO"))
